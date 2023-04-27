@@ -11,7 +11,9 @@ app.use(express.json());
 
 // ROUTES
 app.get('/', (req, res) => {
-    res.send('Welcome to Team 2 - Capstone Project')
+    // res.send('Welcome to Team 2 - Capstone Project')
+    res.json({ message: 'Welcome to Team 2 - Capstone Project'})
+
 });
 
 app.get('*', (req, res) => {
