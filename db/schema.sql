@@ -1,0 +1,4 @@
+DROP DATABASE IF EXISTS kickit;
+CREATE DATABASE kickit;
+
+\c kickit;
