@@ -11,24 +11,11 @@ CREATE TABLE users(
     last_name VARCHAR(30) NOT NULL,
     age INTEGER NOT NULL,
     username VARCHAR(30) UNIQUE NOT NULL,
+    interest INTEGER REFERENCES categories(id) NOT NUll,
     email TEXT UNIQUE NOT NULL,
     profile_img TEXT
+    ON DELETE CASCADE
 );
-
-
--- DROP TABLE IF EXISTS users;
-
--- CREATE TABLE users(
---     id SERIAL PRIMARY KEY,
---     username TEXT UNIQUE NOT NULL,
---     firstname TEXT NOT NULL,
---     lastname TEXT NOT NULL,
---     email TEXT UNIQUE NOT NULL,
---     phonenumber TEXT NOT NULL,
---     password TEXT NOT NULL
--- );
-
-
 
 
 DROP TABLE IF EXISTS categories;
@@ -36,7 +23,6 @@ CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
     name VARCHAR(30)
 );
-
 
 
 DROP TABLE IF EXISTS events;
@@ -57,13 +43,20 @@ CREATE TABLE events (
     ON DELETE CASCADE
 );
 
+DROP TABLE IF EXISTS users_categories;
+
+CREATE TABLE users_categories (
+    users_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
+    PRIMARY KEY (users_id, category_id)
+);
+
 DROP TABLE IF EXISTS events_categories;
 CREATE TABLE events_categories (
     event_id INTEGER REFERENCES events(id) ON DELETE CASCADE,
     category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
     PRIMARY KEY (event_id, category_id)
 );
-
 
 
 DROP TABLE IF EXISTS comments;
