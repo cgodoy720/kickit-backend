@@ -3,10 +3,12 @@ const db = require("../db/dbConfig")
 const getAllEvents = async () => {
     try {
       const allEvents = await db.manyOrNone(`
-        SELECT events.*, array_agg(categories.name) AS category_names
-        FROM events
-        LEFT JOIN categories ON categories.id = ANY (events.category)
-        GROUP BY events.id
+      SELECT events.*, array_agg(categories.name) AS category_names
+      FROM events
+      JOIN events_categories ON events.id = events_categories.event_id
+      JOIN categories ON categories.id = events_categories.category_id
+      GROUP BY events.id
+      HAVING count(*) > 1 OR count(events_categories.event_id) = 1;
       `);
       return allEvents;
     } catch (error) {
@@ -18,10 +20,11 @@ const getEvents = async (id) => {
     try{
         const oneEvent = await db.one(`
         SELECT events.*, array_agg(categories.name) AS category_names
-        FROM events
-        LEFT JOIN categories ON categories.id = ANY (events.category)
+      FROM events
+      JOIN events_categories ON events.id = events_categories.event_id
+      JOIN categories ON categories.id = events_categories.category_id
         WHERE events.id=$1
-        GROUP BY events.id`, id)
+        GROUP BY events.id  HAVING count(*) > 1 OR count(events_categories.event_id) = 1;`, id)
         return oneEvent
     }
     catch(error){
@@ -58,6 +61,9 @@ const createEvent = async (event, categoryIds) => {
         ]
       );
       
+      const eventCategoryValues = categoryIds.map((categoryId) => `(${newEvent.id}, ${categoryId})`).join(',');
+      await db.none(`INSERT INTO events_categories (event_id, category_id) VALUES ${eventCategoryValues}`);
+
       //insert a new colum call category_names that store the array of category names 
       newEvent.category_names = categoryNames.map((category) => category.name);
       
