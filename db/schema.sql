@@ -3,20 +3,6 @@ CREATE DATABASE kickit;
 
 \c kickit;
 
-DROP TABLE IF EXISTS users;
-
-CREATE TABLE users(
-    id SERIAL PRIMARY KEY,
-    first_name VARCHAR(30) NOT NULL,
-    last_name VARCHAR(30) NOT NULL,
-    age INTEGER NOT NULL,
-    username VARCHAR(30) UNIQUE NOT NULL,
-    interest INTEGER REFERENCES categories(id) NOT NUll,
-    email TEXT UNIQUE NOT NULL,
-    profile_img TEXT
-    ON DELETE CASCADE
-);
-
 
 DROP TABLE IF EXISTS categories;
 CREATE TABLE categories (
@@ -24,6 +10,17 @@ CREATE TABLE categories (
     name VARCHAR(30)
 );
 
+DROP TABLE IF EXISTS users;
+CREATE TABLE users(
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(30) NOT NULL,
+    last_name VARCHAR(30) NOT NULL,
+    age INTEGER NOT NULL,
+    username VARCHAR(30) UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    profile_img TEXT,
+    interest INTEGER REFERENCES categories(id) ON DELETE CASCADE NOT NULL
+);
 
 DROP TABLE IF EXISTS events;
 CREATE TABLE events (
