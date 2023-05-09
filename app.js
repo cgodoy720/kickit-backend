@@ -6,7 +6,7 @@ const cors = require('cors');
 const app = express();
 
 // CONTROLLERS
-const eventsController = require("./controllers/eventsController"); 
+const eventsController = require("./controllers/EventsController"); 
 
 // MIDDLEWARE
 app.use(cors());
