@@ -17,8 +17,7 @@ const getAllEvents = async () => {
   };
 
 
-
-const getEvents = async (id) => {
+const getEvent = async (id) => {
     try{
         const oneEvent = await db.one(`
         SELECT events.*, array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names
@@ -121,4 +120,5 @@ const deleteEvent = async (id) => {
     }
 }
 
-module.exports = {deleteEvent , createEvent, getAllEvents, getEvents, addCategory, deleteCategoryFromEvent}
+
+module.exports = {deleteEvent , createEvent, getAllEvents, getEvent, addCategory, deleteCategoryFromEvent}
