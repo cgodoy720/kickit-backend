@@ -8,6 +8,8 @@ const app = express();
 // CONTROLLERS
 const eventsController = require("./controllers/EventsController"); 
 
+const categoryController = require("./controllers/categoriesController")
+
 // MIDDLEWARE
 app.use(cors());
 app.use(express.json());
@@ -20,6 +22,8 @@ app.get('/', (req, res) => {
 });
 
 app.use("/events", eventsController);
+
+app.use("/category", categoryController)
 
 app.get('*', (req, res) => {
     res.status(404).send('Not Found')
