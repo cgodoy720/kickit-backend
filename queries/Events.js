@@ -76,11 +76,11 @@ const createEvent = async (event, categoryIds) => {
   
 
 
-const deleteCategoryFromEvent = async (categoryId, eventId) => {
+const deleteCategoryFromEvent = async (eventId, categoryId) => {
   try{
     const deleteCategory = await db.result(
-      'DELETE FROM events_categories WHERE category_id = $1 AND event_id=$2 RETURNING *,'
-      [categoryId , eventId]
+      'DELETE FROM events_categories WHERE event_id = $1 AND category_id=$2 RETURNING *,'
+      [eventId, categoryId]
     )
     return deleteCategory.rowCount
   }
@@ -90,15 +90,15 @@ const deleteCategoryFromEvent = async (categoryId, eventId) => {
 }
 
 
-const addCategory = async(categoryIds , eventId) => {
+const addCategory = async(eventId , categoryIds) => {
   try{
 
      await db.one(
-      'INSERT INTO events_categories (category_id, event_id) values($1 , $2)',
-      [categoryIds , eventId]
+      'INSERT INTO events_categories (event_id ,category_id) values($1 , $2)',
+      [eventId , categoryIds]
     )
 
-    const updateEvent = await getEvents(eventId)
+    const updateEvent = await getEvent(eventId)
     return updateEvent
   }
   catch(error){
