@@ -35,44 +35,51 @@ const getEvent = async (id) => {
 
 
 const createEvent = async (event, categoryIds) => {
-    try {
+  try {
+    const categoryNames = await db.manyOrNone(
+      `SELECT name, id FROM categories WHERE id = ANY($1)`,
+      [categoryIds]
+    );
 
-       //Grabbing all the categories from the category table that matches with the categoryIds parameter  
-      const categoryNames = await db.manyOrNone(
-        `SELECT name , id FROM categories WHERE id = ANY($1)`,
-        [categoryIds]
-      );
-      
-      const newEvent = await db.one(
-        `INSERT INTO events (title, date_created, date_event, category, summary, max_people, age_restriction, age_min, age_max, location, creator_id)
-         VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-         RETURNING *`,
-        [
-          event.title,
-          event.date_created,
-          event.date_event,
-          categoryIds,
-          event.summary,
-          event.max_people,
-          event.age_restriction,
-          event.age_min,
-          event.age_max,
-          event.location,
-          event.creator_id,
-        ]
-      );
-      
-      const eventCategoryValues = categoryIds.map((categoryId) => `(${newEvent.id}, ${categoryId})`).join(',');
-      await db.none(`INSERT INTO events_categories (event_id, category_id) VALUES ${eventCategoryValues}`);
+    const newEvent = await db.one(
+      `INSERT INTO events (title, date_created, date_event, summary, max_people, age_restriction, age_min, age_max, location, creator_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       RETURNING *`,
+      [
+        event.title,
+        event.date_created,
+        event.date_event,
+        event.summary,
+        event.max_people,
+        event.age_restriction,
+        event.age_min,
+        event.age_max,
+        event.location,
+        event.creator_id,
+      ]
+    );
 
-      //insert a new colum call category_names that store the array of category names 
-      newEvent.category_names = categoryNames.map((category) => ({ id: category.id, name: category.name }));
-      
-      return newEvent;
-    } catch (error) {
-      return error;
-    }
-  };
+    const eventCategoryValues = categoryIds
+      .map((categoryId) => `(${newEvent.id}, ${categoryId})`)
+      .join(',');
+    await db.none(
+      `INSERT INTO events_categories (event_id, category_id) VALUES ${eventCategoryValues}`
+    );
+
+    newEvent.category_names = categoryNames.map((category) => ({
+      id: category.id,
+      name: category.name,
+    }));
+
+    return newEvent;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+
+
   
 
 

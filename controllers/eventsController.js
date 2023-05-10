@@ -43,8 +43,9 @@ events.get("/:id", async (req, res) => {
 //! CREATE A NEW EVENT
 events.post("/", async (req, res) => {
     try {
-        const event = await createEvent(req.body);
-        res.json(event);
+    const { categoryIds, ...event } = req.body; // Extract categoryIds from req.body
+    const createdEvent = await createEvent(event, categoryIds); // Pass categoryIds to createEvent function
+    res.json(createdEvent);
     } catch (error) {
         res.status(400).json({ error: error });
     }
