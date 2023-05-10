@@ -3,7 +3,8 @@ const db = require("../db/dbConfig")
 const getAllEvents = async () => {
     try {
       const allEvents = await db.manyOrNone(`
-      SELECT events.*, array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names
+      SELECT events.*, array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
+      to_char(start_time, 'HH:MI AM') AS start_time, to_char(end_time, 'HH:MI AM') AS end_time
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
@@ -45,8 +46,8 @@ const createEvent = async (event, categoryIds) => {
     );
 
     const newEvent = await db.one(
-      `INSERT INTO events (title, date_created, date_event, summary, max_people, age_restriction, age_min, age_max, location, creator_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `INSERT INTO events (title, date_created, date_event, summary, max_people, age_restriction, age_min, age_max, location, address, start_time, end_time, location_image, creator_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
        RETURNING *`,
       [
         event.title,
@@ -58,6 +59,10 @@ const createEvent = async (event, categoryIds) => {
         event.age_min,
         event.age_max,
         event.location,
+        event.address,
+        event.start_time,
+        event.end_time,
+        event.location_image,
         event.creator_id,
       ]
     );
