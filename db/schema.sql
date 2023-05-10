@@ -18,8 +18,7 @@ CREATE TABLE users(
     age INTEGER NOT NULL,
     username VARCHAR(30) UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    profile_img TEXT,
-    interest INTEGER REFERENCES categories(id) ON DELETE CASCADE NOT NULL
+    profile_img TEXT
 );
 
 DROP TABLE IF EXISTS events;
@@ -35,6 +34,7 @@ CREATE TABLE events (
     age_max INTEGER,
     CHECK(age_min <= age_max),
     location TEXT NOT NULL,
+    address TEXT NOT NULL,
     creator_id INTEGER REFERENCES users(id) ON DELETE CASCADE
 );
 

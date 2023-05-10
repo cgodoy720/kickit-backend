@@ -95,7 +95,7 @@ events.post("/:eventId/categories", async (req, res) => {
 //! UPDATE AN EVENT
 
 events.put("/:id", async (req , res) => {
-    const {id} = req.params;
+    const { id } = req.params;
 
     const updatedEvent = await updateEvent(id, req.body);
 

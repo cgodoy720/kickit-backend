@@ -136,13 +136,11 @@ const updateEvent = async(id , event) => {
 
   try{
   
-  const updateEvent = await db.one(
-    'UPDATE events SET title=$1, date_event=$2, summary=$3, max_people=$4, age_restriction=$5, age_min=$6, age_max=$7, location=$8 WHERE id=$9',
-    [event.title , event.date_event, event.summary, event.max_people, event.age_restriction, event.age_min, event.age_max, event.location, id ]
-  )
-  
-  return updateEvent
-  
+  const updatedEvent = await db.one(
+    'UPDATE events SET title=$1, date_event=$2, summary=$3, max_people=$4, age_restriction=$5, age_min=$6, age_max=$7, location=$8 , address=$9 WHERE id=$10 RETURNING *',
+    [event.title , event.date_event, event.summary, event.max_people, event.age_restriction, event.age_min, event.age_max, event.location, event.address, id ]
+  );
+  return updatedEvent
   }
   catch(error){
     return error
