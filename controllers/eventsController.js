@@ -43,8 +43,9 @@ events.get("/:id", async (req, res) => {
 //! CREATE A NEW EVENT
 events.post("/", async (req, res) => {
     try {
-        const event = await createEvent(req.body);
-        res.json(event);
+    const { categoryIds, ...event } = req.body; // Extract categoryIds from req.body
+    const createdEvent = await createEvent(event, categoryIds); // Pass categoryIds to createEvent function
+    res.json(createdEvent);
     } catch (error) {
         res.status(400).json({ error: error });
     }
@@ -64,27 +65,25 @@ events.delete("/:id", async (req, res) => {
 
 
 //Delete Category From Event
-events.delete("/:eventId/categories/:categoryId", async (req , res) => {
-    const {eventId , categoryId} = req.params
-    
-        const deleteCategory = await deleteCategoryFromEvent(eventId, categoryId)
-        if(deleteCategory.id){
-            res.status(200).json(deleteCategory)
-        }
-        else{
-            res.status(404).json({ error: "Event category not found!"});
-        }
-    
-})
+events.delete("/:eventId/categories/:categoryId", async (req, res) => {
+    const { eventId, categoryId } = req.params;
+  
+    const deleteCategory = await deleteCategoryFromEvent(eventId, categoryId);
+    if (deleteCategory > 0) {
+      res.status(200).json({ success: true });
+    } else {
+      res.status(404).json({ error: "Event category not found!" });
+    }
+  });
 
 
 //Add Category to Event
 
 events.post("/:eventId/categories", async (req, res) => {
     const { eventId} = req.params;
-    const { category } = req.body;
+    const { categoryIds } = req.body;
     try {
-        const event = await addCategory(eventId, category);
+        const event = await addCategory(eventId, categoryIds);
         res.status(200).json(event);
     } catch (error) {
         res.status(500).json({ error: "Server error!" });
