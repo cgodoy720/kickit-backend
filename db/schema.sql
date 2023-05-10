@@ -28,7 +28,6 @@ CREATE TABLE events (
     title VARCHAR(50) NOT NULL,
     date_created TIMESTAMP WITH TIME ZONE DEFAULT TO_TIMESTAMP(TO_CHAR(CURRENT_TIMESTAMP, 'MM/DD/YYYY'), 'MM?DD?YYYY'),
     date_event TEXT NOT NULL,
-    category INTEGER REFERENCES categories(id) NOT NUll,
     summary TEXT NOT NULL,
     max_people INTEGER, 
     age_restriction BOOLEAN,
@@ -36,8 +35,7 @@ CREATE TABLE events (
     age_max INTEGER,
     CHECK(age_min <= age_max),
     location TEXT NOT NULL,
-    creator_id INTEGER REFERENCES users(id)
-    ON DELETE CASCADE
+    creator_id INTEGER REFERENCES users(id) ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS users_categories;
