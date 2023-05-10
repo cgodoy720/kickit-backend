@@ -9,7 +9,8 @@ const { getAllEvents,
     createEvent, 
     deleteEvent, 
     addCategory,
-    deleteCategoryFromEvent } = require("../queries/Events");
+    deleteCategoryFromEvent,
+    updateEvent } = require("../queries/Events");
 
 
 events.use("/:eventId/comments", comm)
@@ -93,6 +94,15 @@ events.post("/:eventId/categories", async (req, res) => {
 
 
 //! UPDATE AN EVENT
+
+events.put("/:id", async (req , res) => {
+    const {id} = req.params;
+
+    const updatedEvent = await updateEvent(id, req.body);
+
+    res.status(200).json(updatedEvent);
+})
+
 
 
 module.exports = events;
