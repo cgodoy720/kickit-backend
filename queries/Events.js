@@ -1,29 +1,38 @@
 const db = require("../db/dbConfig")
 
 const getAllEvents = async () => {
-    try {
-      const allEvents = await db.manyOrNone(`
-      SELECT events.*, array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
-      to_char(start_time, 'HH:MI AM') AS start_time, to_char(end_time, 'HH:MI AM') AS end_time
+  try {
+    const allEvents = await db.manyOrNone(`
+      SELECT events.*, 
+      array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
+      to_char(start_time, 'HH:MI AM') AS start_time, 
+      to_char(end_time, 'HH:MI AM') AS end_time,
+      to_char(date_created, 'MM/DD/YYYY') AS date_created, 
+      to_char(date_event, 'MM/DD/YYYY') AS date_event
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
       GROUP BY events.id
       HAVING count(*) > 1 OR count(events_categories.event_id) = 1;
-      `);
-      return allEvents;
-    } catch (error) {
-      return error;
-    }
-  };
+    `);
+    return allEvents;
+  } catch (error) {
+    return error;
+  }
+};
+
 
 
 const getEvent = async (id) => {
   try {
     const oneEvent = await db.one(
       `
-      SELECT events.*, array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
-      to_char(start_time, 'HH:MI AM') AS start_time, to_char(end_time, 'HH:MI AM') AS end_time
+      SELECT events.*, 
+      array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
+      to_char(start_time, 'HH:MI AM') AS start_time, 
+      to_char(end_time, 'HH:MI AM') AS end_time,
+      to_char(date_created, 'MM/DD/YYYY') AS date_created, 
+      to_char(date_event, 'MM/DD/YYYY') AS date_event
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
