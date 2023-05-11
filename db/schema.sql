@@ -16,6 +16,8 @@ CREATE TABLE users(
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
     age INTEGER NOT NULL,
+    pronouns TEXT,
+    bio VARCHAR(200),
     username VARCHAR(30) UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
     profile_img TEXT
