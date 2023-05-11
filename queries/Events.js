@@ -22,7 +22,8 @@ const getEvent = async (id) => {
   try {
     const oneEvent = await db.one(
       `
-      SELECT events.*, array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names
+      SELECT events.*, array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
+      to_char(start_time, 'HH:MI AM') AS start_time, to_char(end_time, 'HH:MI AM') AS end_time
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
