@@ -56,7 +56,8 @@ const createEvent = async (event, categoryIds) => {
     );
 
     const newEvent = await db.one(
-      `INSERT INTO events (title, date_created, date_event, summary, max_people, age_restriction, age_min, age_max, location, address, start_time, end_time, location_image, creator_id)
+      `INSERT INTO events (title, date_created, date_event, summary,
+         max_people, age_restriction, age_min, age_max, location, address, start_time, end_time, location_image, creator_id)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
        RETURNING *`,
       [
@@ -152,8 +153,14 @@ const updateEvent = async(id , event) => {
   try{
   
   const updatedEvent = await db.one(
-    'UPDATE events SET title=$1, date_event=$2, summary=$3, max_people=$4, age_restriction=$5, age_min=$6, age_max=$7, location=$8 , address=$9 WHERE id=$10 RETURNING *',
-    [event.title , event.date_event, event.summary, event.max_people, event.age_restriction, event.age_min, event.age_max, event.location, event.address, id ]
+    `
+    UPDATE events SET title=$1, date_event=$2, summary=$3, max_people=$4, age_restriction=$5, 
+    age_min=$6, age_max=$7, location=$8, 
+    address=$9, start_time=$10, end_time=$11, location_image=12 WHERE id=$13 RETURNING *`,
+
+    [event.title , event.date_event, event.summary, event.max_people, event.age_restriction
+    ,event.age_min, event.age_max, event.location, 
+    event.address, event.start_time, event.end_time, event.location_image, id ]
   );
   return updatedEvent
   }
