@@ -5,7 +5,7 @@ const db = require("../db/dbConfig")
 const getAllComments = async (event_id) => {
     try{
        const allComments = await db.any(
-           "SELECT * FROM comments WHERE events_id = $1",
+           "SELECT *, to_char(time, 'MM/DD/YYYY') AS time FROM comments WHERE events_id = $1",
            event_id
        ) 
        return allComments
@@ -17,7 +17,7 @@ const getAllComments = async (event_id) => {
 
 const getComment = async (id) => {
     try{
-        const getComment = await db.one("SELECT * FROM comments WHERE id=$1", id)
+        const getComment = await db.one("SELECT *, to_char(time, 'MM/DD/YYYY') AS time FROM comments WHERE id=$1", id)
         return getComment
     }
     catch(error){
@@ -28,15 +28,9 @@ const getComment = async (id) => {
 const createComment = async (comm) => {
     try{
         
-        const currentDate = new Date().toLocaleDateString('en-US', { 
-            month: '2-digit', 
-            day: '2-digit', 
-            year: 'numeric' 
-        }).split('/').join('/');
-
         const addComment = await db.one(
-            'INSERT INTO comments (comment, events_id, user_id, time) VALUES($1, $2, $3, $4) RETURNING *',
-            [comm.comment, comm.events_id, comm.user_id, currentDate]
+            'INSERT INTO comments (comment, events_id, user_id) VALUES($1, $2, $3) RETURNING *',
+            [comm.comment, comm.events_id, comm.user_id]
         )
         return addComment
 
