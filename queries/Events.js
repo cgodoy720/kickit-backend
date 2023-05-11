@@ -1,27 +1,38 @@
 const db = require("../db/dbConfig")
 
 const getAllEvents = async () => {
-    try {
-      const allEvents = await db.manyOrNone(`
-      SELECT events.*, array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names
+  try {
+    const allEvents = await db.manyOrNone(`
+      SELECT events.*, 
+      array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
+      to_char(start_time, 'HH:MI AM') AS start_time, 
+      to_char(end_time, 'HH:MI AM') AS end_time,
+      to_char(date_created, 'MM/DD/YYYY') AS date_created, 
+      to_char(date_event, 'MM/DD/YYYY') AS date_event
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
       GROUP BY events.id
       HAVING count(*) > 1 OR count(events_categories.event_id) = 1;
-      `);
-      return allEvents;
-    } catch (error) {
-      return error;
-    }
-  };
+    `);
+    return allEvents;
+  } catch (error) {
+    return error;
+  }
+};
+
 
 
 const getEvent = async (id) => {
   try {
     const oneEvent = await db.one(
       `
-      SELECT events.*, array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names
+      SELECT events.*, 
+      array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
+      to_char(start_time, 'HH:MI AM') AS start_time, 
+      to_char(end_time, 'HH:MI AM') AS end_time,
+      to_char(date_created, 'MM/DD/YYYY') AS date_created, 
+      to_char(date_event, 'MM/DD/YYYY') AS date_event
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
@@ -45,8 +56,9 @@ const createEvent = async (event, categoryIds) => {
     );
 
     const newEvent = await db.one(
-      `INSERT INTO events (title, date_created, date_event, summary, max_people, age_restriction, age_min, age_max, location, creator_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `INSERT INTO events (title, date_created, date_event, summary,
+         max_people, age_restriction, age_min, age_max, location, address, start_time, end_time, location_image, creator_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
        RETURNING *`,
       [
         event.title,
@@ -58,6 +70,10 @@ const createEvent = async (event, categoryIds) => {
         event.age_min,
         event.age_max,
         event.location,
+        event.address,
+        event.start_time,
+        event.end_time,
+        event.location_image,
         event.creator_id,
       ]
     );
@@ -136,13 +152,17 @@ const updateEvent = async(id , event) => {
 
   try{
   
-  const updateEvent = await db.one(
-    'UPDATE events SET title=$1, date_event=$2, summary=$3, max_people=$4, age_restriction=$5, age_min=$6, age_max=$7, location=$8 WHERE id=$9',
-    [event.title , event.date_event, event.summary, event.max_people, event.age_restriction, event.age_min, event.age_max, event.location, id ]
-  )
-  
-  return updateEvent
-  
+  const updatedEvent = await db.one(
+    `
+    UPDATE events SET title=$1, date_event=$2, summary=$3, max_people=$4, age_restriction=$5, 
+    age_min=$6, age_max=$7, location=$8, 
+    address=$9, start_time=$10, end_time=$11, location_image=12 WHERE id=$13 RETURNING *`,
+
+    [event.title , event.date_event, event.summary, event.max_people, event.age_restriction
+    ,event.age_min, event.age_max, event.location, 
+    event.address, event.start_time, event.end_time, event.location_image, id ]
+  );
+  return updatedEvent
   }
   catch(error){
     return error
