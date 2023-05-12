@@ -15,7 +15,7 @@ CREATE TABLE users(
     id SERIAL PRIMARY KEY,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
-    age INTEGER NOT NULL,
+    age DATE NOT NULL,
     pronouns TEXT,
     bio VARCHAR(200),
     username VARCHAR(30) UNIQUE NOT NULL,
@@ -106,7 +106,34 @@ CREATE TABLE users_friends(
     senders_id INTEGER,
     message TEXT,
     PRIMARY KEY(users_id , senders_id)
-)
+);
+
+
+CREATE OR REPLACE FUNCTION update_users_friends()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'UPDATE' THEN
+        UPDATE users_friends
+        SET
+            first_name = NEW.first_name,
+            last_name = NEW.last_name,
+            pronouns = NEW.pronouns,
+            profile_img = NEW.profile_img
+        WHERE users_id = OLD.id;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_users_friends_trigger
+AFTER UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION update_users_friends();
+
+
+
+
+
 
 
 DROP TABLE IF EXISTS comments;
