@@ -8,7 +8,7 @@ const getAllEvents = async () => {
       to_char(start_time, 'HH:MI AM') AS start_time, 
       to_char(end_time, 'HH:MI AM') AS end_time,
       to_char(date_created, 'MM/DD/YYYY') AS date_created, 
-      to_char(date_event, 'MM/DD/YYYY') AS date_event,
+      to_char(date_event, 'MM/DD/YYYY') AS date_event
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
@@ -48,11 +48,11 @@ const getEvent = async (id) => {
 };
 
 
-const createEvent = async (event, categoryIds) => {
+const createEvent = async (event, categoryNames) => {
   try {
-    const categoryNames = await db.manyOrNone(
-      `SELECT name, id FROM categories WHERE id = ANY($1)`,
-      [categoryIds]
+    const categoryIds = await db.manyOrNone(
+      `SELECT id FROM categories WHERE name = ANY($1)`,
+      [categoryNames]
     );
 
     const newEvent = await db.one(
@@ -78,15 +78,15 @@ const createEvent = async (event, categoryIds) => {
     );
 
     const eventCategoryValues = categoryIds
-      .map((categoryId) => `(${newEvent.id}, ${categoryId})`)
+      .map((categoryId) => `(${newEvent.id}, ${categoryId.id})`)
       .join(',');
     await db.none(
       `INSERT INTO events_categories (event_id, category_id) VALUES ${eventCategoryValues}`
     );
 
-    newEvent.category_names = categoryNames.map((category) => ({
-      id: category.id,
-      name: category.name,
+    newEvent.category_names = categoryNames.map((name, index) => ({
+      id: categoryIds[index].id,
+      name: name,
     }));
 
     return newEvent;
@@ -96,9 +96,6 @@ const createEvent = async (event, categoryIds) => {
   }
 };
 
-
-
-  
 
 
 const deleteCategoryFromEvent = async (eventId, categoryId) => {

@@ -132,10 +132,6 @@ EXECUTE FUNCTION update_users_friends();
 
 
 
-
-
-
-
 DROP TABLE IF EXISTS comments;
 CREATE TABLE comments (
     id SERIAL PRIMARY KEY,
