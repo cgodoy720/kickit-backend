@@ -15,7 +15,9 @@ CREATE TABLE users(
     id SERIAL PRIMARY KEY,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
-    age INTEGER NOT NULL,
+    age DATE NOT NULL,
+    pronouns TEXT,
+    bio VARCHAR(200),
     username VARCHAR(30) UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
     profile_img TEXT
@@ -43,6 +45,8 @@ CREATE TABLE events (
     creator_id INTEGER REFERENCES users(id) ON DELETE CASCADE
 );
 
+
+
 DROP TABLE IF EXISTS users_categories;
 
 CREATE TABLE users_categories (
@@ -64,6 +68,73 @@ CREATE TABLE users_events(
     users_id INTEGER,
     event_id INTEGER 
 );
+
+
+
+CREATE OR REPLACE FUNCTION update_user_events()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'UPDATE' THEN
+        UPDATE users_events
+        SET event_id = NEW.id,
+            title = NEW.title,
+            date_event = NEW.date_event,
+            summary = NEW.summary,
+            max_people = NEW.max_people,
+            age_restriction = NEW.age_restriction,
+            age_min = NEW.age_min,
+            age_max = NEW.age_max,
+            location = NEW.location,
+            address = NEW.address,
+            start_time = NEW.start_time,
+            end_time = NEW.end_time,
+            location_image = NEW.location_image
+        WHERE event_id = OLD.id;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_user_events_trigger
+AFTER UPDATE ON events
+FOR EACH ROW
+EXECUTE FUNCTION update_user_events();
+
+DROP TABLE IF EXISTS users_friends;
+CREATE TABLE users_friends(
+    users_id INTEGER, 
+    senders_id INTEGER,
+    message TEXT,
+    PRIMARY KEY(users_id , senders_id)
+);
+
+
+CREATE OR REPLACE FUNCTION update_users_friends()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'UPDATE' THEN
+        UPDATE users_friends
+        SET
+            first_name = NEW.first_name,
+            last_name = NEW.last_name,
+            pronouns = NEW.pronouns,
+            profile_img = NEW.profile_img
+        WHERE users_id = OLD.id;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_users_friends_trigger
+AFTER UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION update_users_friends();
+
+
+
+
+
+
 
 DROP TABLE IF EXISTS comments;
 CREATE TABLE comments (
