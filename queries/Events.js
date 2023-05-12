@@ -8,7 +8,7 @@ const getAllEvents = async () => {
       to_char(start_time, 'HH:MI AM') AS start_time, 
       to_char(end_time, 'HH:MI AM') AS end_time,
       to_char(date_created, 'MM/DD/YYYY') AS date_created, 
-      to_char(date_event, 'MM/DD/YYYY') AS date_event
+      to_char(date_event, 'MM/DD/YYYY') AS date_event,
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
@@ -56,13 +56,12 @@ const createEvent = async (event, categoryIds) => {
     );
 
     const newEvent = await db.one(
-      `INSERT INTO events (title, date_created, date_event, summary,
+      `INSERT INTO events (title, date_event, summary,
          max_people, age_restriction, age_min, age_max, location, address, start_time, end_time, location_image, creator_id)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
        RETURNING *`,
       [
         event.title,
-        event.date_created,
         event.date_event,
         event.summary,
         event.max_people,
