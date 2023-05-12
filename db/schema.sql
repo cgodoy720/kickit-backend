@@ -100,6 +100,14 @@ AFTER UPDATE ON events
 FOR EACH ROW
 EXECUTE FUNCTION update_user_events();
 
+DROP TABLE IF EXISTS users_friends;
+CREATE TABLE users_friends(
+    users_id INTEGER, 
+    senders_id INTEGER,
+    message TEXT,
+    PRIMARY KEY(users_id , senders_id)
+)
+
 
 DROP TABLE IF EXISTS comments;
 CREATE TABLE comments (
