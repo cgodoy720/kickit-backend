@@ -13,7 +13,7 @@ const getAllEvents = async () => {
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
-      JOIN users ON users.id = events.creator_id 
+      JOIN users ON users.id = events.creator
       GROUP BY events.id
       HAVING count(*) > 1 OR count(events_categories.event_id) = 1;
     `);
@@ -70,7 +70,7 @@ const createEvent = async (event, categoryNames, creatorUsernames) => {
     // Insert new event into events table
     const newEvent = await db.one(
       `INSERT INTO events (title, date_event, summary,
-         max_people, age_restriction, age_min, age_max, location, address, start_time, end_time, location_image, creator_id)
+         max_people, age_restriction, age_min, age_max, location, address, start_time, end_time, location_image, creator)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
        RETURNING *`,
       [
@@ -86,7 +86,7 @@ const createEvent = async (event, categoryNames, creatorUsernames) => {
         event.start_time,
         event.end_time,
         event.location_image,
-        event.creator_id, // Assuming there is only one creator
+        event.creator // Assuming there is only one creator
       ]
     );
 
