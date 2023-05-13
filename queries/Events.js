@@ -5,6 +5,7 @@ const getAllEvents = async () => {
     const allEvents = await db.manyOrNone(`
       SELECT events.*, 
       array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
+      array_agg(json_build_object('id', users.id, 'username', users.username)) AS creator,
       to_char(start_time, 'HH:MI AM') AS start_time, 
       to_char(end_time, 'HH:MI AM') AS end_time,
       to_char(date_created, 'MM/DD/YYYY') AS date_created, 
@@ -12,11 +13,13 @@ const getAllEvents = async () => {
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
+      JOIN users ON users.id = events.creator_id 
       GROUP BY events.id
       HAVING count(*) > 1 OR count(events_categories.event_id) = 1;
     `);
     return allEvents;
   } catch (error) {
+    console.log(error)
     return error;
   }
 };
@@ -29,6 +32,7 @@ const getEvent = async (id) => {
       `
       SELECT events.*, 
       array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
+      array_agg(json_build_object('id', users.id, 'username', users.username)) AS creator,
       to_char(start_time, 'HH:MI AM') AS start_time, 
       to_char(end_time, 'HH:MI AM') AS end_time,
       to_char(date_created, 'MM/DD/YYYY') AS date_created, 
@@ -36,6 +40,7 @@ const getEvent = async (id) => {
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
+      JOIN users ON users.id = events.creator_id 
       WHERE events.id = $1
       GROUP BY events.id HAVING count(*) > 1 OR count(events_categories.event_id) = 1;
       `,
@@ -48,13 +53,21 @@ const getEvent = async (id) => {
 };
 
 
-const createEvent = async (event, categoryNames) => {
+const createEvent = async (event, categoryNames, creatorUsernames) => {
   try {
+    // Retrieve category IDs
     const categoryIds = await db.manyOrNone(
       `SELECT id FROM categories WHERE name = ANY($1)`,
       [categoryNames]
     );
 
+    // Retrieve creator IDs based on usernames
+    const creatorIds = await db.manyOrNone(
+      `SELECT id FROM users WHERE username = ANY($1)`,
+      [creatorUsernames]
+    );
+
+    // Insert new event into events table
     const newEvent = await db.one(
       `INSERT INTO events (title, date_event, summary,
          max_people, age_restriction, age_min, age_max, location, address, start_time, end_time, location_image, creator_id)
@@ -73,10 +86,11 @@ const createEvent = async (event, categoryNames) => {
         event.start_time,
         event.end_time,
         event.location_image,
-        event.creator_id,
+        event.creator_id, // Assuming there is only one creator
       ]
     );
 
+    // Insert event-category relationships into events_categories table
     const eventCategoryValues = categoryIds
       .map((categoryId) => `(${newEvent.id}, ${categoryId.id})`)
       .join(',');
@@ -84,9 +98,15 @@ const createEvent = async (event, categoryNames) => {
       `INSERT INTO events_categories (event_id, category_id) VALUES ${eventCategoryValues}`
     );
 
+    // Add category_names and creator arrays to the new event object
     newEvent.category_names = categoryNames.map((name, index) => ({
       id: categoryIds[index].id,
       name: name,
+    }));
+
+    newEvent.creator = creatorIds.map((username, index) => ({
+      id: creatorIds[index].id,
+      username: username,
     }));
 
     return newEvent;
