@@ -5,7 +5,8 @@ const getAllEvents = async () => {
     const allEvents = await db.manyOrNone(`
       SELECT events.*, 
       array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
-      array_agg(json_build_object('id', users.id, 'username', users.username)) AS creator,
+      array_agg(json_build_object('id', users.id, 'username', 
+      users.username, 'first_name', first_name, 'last_name', last_name, 'age', EXTRACT(YEAR FROM AGE(CURRENT_DATE, age)) )) AS creator,
       to_char(start_time, 'HH:MI AM') AS start_time, 
       to_char(end_time, 'HH:MI AM') AS end_time,
       to_char(date_created, 'MM/DD/YYYY') AS date_created, 
@@ -32,7 +33,8 @@ const getEvent = async (id) => {
       `
       SELECT events.*, 
       array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
-      array_agg(json_build_object('id', users.id, 'username', users.username)) AS creator,
+      array_agg(json_build_object('id', users.id, 'username', 
+      users.username, 'first_name', first_name, 'last_name', last_name, 'age', EXTRACT(YEAR FROM AGE(CURRENT_DATE, age)) )) AS creator,
       to_char(start_time, 'HH:MI AM') AS start_time, 
       to_char(end_time, 'HH:MI AM') AS end_time,
       to_char(date_created, 'MM/DD/YYYY') AS date_created, 
@@ -40,7 +42,7 @@ const getEvent = async (id) => {
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
-      JOIN users ON users.id = events.creator_id 
+      JOIN users ON users.id = events.creator
       WHERE events.id = $1
       GROUP BY events.id HAVING count(*) > 1 OR count(events_categories.event_id) = 1;
       `,
@@ -48,6 +50,7 @@ const getEvent = async (id) => {
     );
     return oneEvent;
   } catch (error) {
+    console.log(error)
     return error;
   }
 };
@@ -107,6 +110,9 @@ const createEvent = async (event, categoryNames, creatorUsernames) => {
     newEvent.creator = creatorIds.map((username, index) => ({
       id: creatorIds[index].id,
       username: username,
+      first_name: first_name,
+      last_name: last_name,
+      age: age
     }));
 
     return newEvent;
