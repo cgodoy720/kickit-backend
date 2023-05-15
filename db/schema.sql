@@ -20,7 +20,8 @@ CREATE TABLE users(
     bio VARCHAR(200),
     username VARCHAR(30) UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    profile_img TEXT
+    profile_img TEXT,
+    firebase_id TEXT
 );
 
 DROP TABLE IF EXISTS events;
