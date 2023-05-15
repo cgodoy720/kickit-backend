@@ -5,18 +5,22 @@ const getAllEvents = async () => {
     const allEvents = await db.manyOrNone(`
       SELECT events.*, 
       array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
+      array_agg(json_build_object('id', users.id, 'username', 
+      users.username, 'first_name', first_name, 'last_name', last_name, 'age', EXTRACT(YEAR FROM AGE(CURRENT_DATE, age)) )) AS creator,
       to_char(start_time, 'HH:MI AM') AS start_time, 
       to_char(end_time, 'HH:MI AM') AS end_time,
       to_char(date_created, 'MM/DD/YYYY') AS date_created, 
-      to_char(date_event, 'MM/DD/YYYY') AS date_event,
+      to_char(date_event, 'MM/DD/YYYY') AS date_event
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
+      JOIN users ON users.id = events.creator
       GROUP BY events.id
       HAVING count(*) > 1 OR count(events_categories.event_id) = 1;
     `);
     return allEvents;
   } catch (error) {
+    console.log(error)
     return error;
   }
 };
@@ -29,6 +33,8 @@ const getEvent = async (id) => {
       `
       SELECT events.*, 
       array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names,
+      array_agg(json_build_object('id', users.id, 'username', 
+      users.username, 'first_name', first_name, 'last_name', last_name, 'age', EXTRACT(YEAR FROM AGE(CURRENT_DATE, age)) )) AS creator,
       to_char(start_time, 'HH:MI AM') AS start_time, 
       to_char(end_time, 'HH:MI AM') AS end_time,
       to_char(date_created, 'MM/DD/YYYY') AS date_created, 
@@ -36,6 +42,7 @@ const getEvent = async (id) => {
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
+      JOIN users ON users.id = events.creator
       WHERE events.id = $1
       GROUP BY events.id HAVING count(*) > 1 OR count(events_categories.event_id) = 1;
       `,
@@ -43,21 +50,30 @@ const getEvent = async (id) => {
     );
     return oneEvent;
   } catch (error) {
+    console.log(error)
     return error;
   }
 };
 
 
-const createEvent = async (event, categoryIds) => {
+const createEvent = async (event, categoryNames, creatorUsernames) => {
   try {
-    const categoryNames = await db.manyOrNone(
-      `SELECT name, id FROM categories WHERE id = ANY($1)`,
-      [categoryIds]
+    // Retrieve category IDs
+    const categoryIds = await db.manyOrNone(
+      `SELECT id FROM categories WHERE name = ANY($1)`,
+      [categoryNames]
     );
 
+    // Retrieve creator IDs based on usernames
+    const creatorIds = await db.manyOrNone(
+      `SELECT id FROM users WHERE username = ANY($1)`,
+      [creatorUsernames]
+    );
+
+    // Insert new event into events table
     const newEvent = await db.one(
       `INSERT INTO events (title, date_event, summary,
-         max_people, age_restriction, age_min, age_max, location, address, start_time, end_time, location_image, creator_id)
+         max_people, age_restriction, age_min, age_max, location, address, start_time, end_time, location_image, creator)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
        RETURNING *`,
       [
@@ -73,20 +89,30 @@ const createEvent = async (event, categoryIds) => {
         event.start_time,
         event.end_time,
         event.location_image,
-        event.creator_id,
+        event.creator // Assuming there is only one creator
       ]
     );
 
+    // Insert event-category relationships into events_categories table
     const eventCategoryValues = categoryIds
-      .map((categoryId) => `(${newEvent.id}, ${categoryId})`)
+      .map((categoryId) => `(${newEvent.id}, ${categoryId.id})`)
       .join(',');
     await db.none(
       `INSERT INTO events_categories (event_id, category_id) VALUES ${eventCategoryValues}`
     );
 
-    newEvent.category_names = categoryNames.map((category) => ({
-      id: category.id,
-      name: category.name,
+    // Add category_names and creator arrays to the new event object
+    newEvent.category_names = categoryNames.map((name, index) => ({
+      id: categoryIds[index].id,
+      name: name,
+    }));
+
+    newEvent.creator = creatorIds.map((username, index) => ({
+      id: creatorIds[index].id,
+      username: username,
+      first_name: first_name,
+      last_name: last_name,
+      age: age
     }));
 
     return newEvent;
@@ -96,9 +122,6 @@ const createEvent = async (event, categoryIds) => {
   }
 };
 
-
-
-  
 
 
 const deleteCategoryFromEvent = async (eventId, categoryId) => {

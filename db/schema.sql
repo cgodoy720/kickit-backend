@@ -42,7 +42,7 @@ CREATE TABLE events (
     end_time time,
     CONSTRAINT check_end_after_start CHECK (end_time > start_time),
     location_image TEXT NOT NULL,
-    creator_id INTEGER REFERENCES users(id) ON DELETE CASCADE
+    creator INTEGER REFERENCES users(id) ON DELETE CASCADE
 );
 
 
@@ -129,10 +129,6 @@ CREATE TRIGGER update_users_friends_trigger
 AFTER UPDATE ON users
 FOR EACH ROW
 EXECUTE FUNCTION update_users_friends();
-
-
-
-
 
 
 
