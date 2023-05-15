@@ -67,7 +67,7 @@ CREATE TABLE events_categories (
 DROP TABLE IF EXISTS users_events;
 CREATE TABLE users_events(
     users_id INTEGER,
-    event_id INTEGER 
+    event_id INTEGER, 
 );
 
 
