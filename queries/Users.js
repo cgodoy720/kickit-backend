@@ -82,6 +82,7 @@ const updateUser = async (id, user) => {
     );
     return updatedUser;
   } catch (error) {
+    console.log(error)
     return error;
   }
 };
