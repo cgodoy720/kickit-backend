@@ -1,5 +1,5 @@
 const express = require("express");
-const users = express.Router();
+const users = express.Router({mergeParams: true});
 const {
   getAllUsers,
   getUser,
@@ -7,28 +7,38 @@ const {
   deleteUser,
   updateUser,
   getUserByFirebaseId,
-  deleteCategoryFromUsers,
+  getCategoryFromUsers,
   deleteEventFromUsers,
   addCategoryToUser,
   addEventsToUser,
-  getAllEventsForUsers
+  getAllEventsForUsers,
+  deleteCategoryFromUsers
 } = require("../queries/Users");
 
 users.get("/", async (req, res) => {
   const allUsers = await getAllUsers();
-  if (allUsers[0]) {
-    res.status(200).json(allUsers);
-  } else {
-    res.status(500).json({ error: "server error" });
-  }
+  console.log(allUsers)
+    if (allUsers[0]) {
+      console.log(allUsers)
+        res.status(200).json(allUsers);
+    } else {
+        res.status(500).json({ error: "server error!"});
+    }
 });
 
+
 users.get("/:id", async (req, res) => {
-  try {
-    const user = await getUser(req.params.id);
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ error: error });
+
+  const {id} = req.params
+
+  const getUsers = await getUser(id)
+console.log(getUsers)
+  if(!getUsers.message){
+    console.log(getUsers)
+    res.json(getUsers)
+  }
+  else{
+    res.status(500).json({ error: "User not found!"});
   }
 });
 
@@ -70,41 +80,49 @@ users.put("/:id", async (req, res) => {
   }
 });
 
-//Add Categories/Interests to Users
-users.post("/:userId/categories", async (req , res) => {
+//Add Categories to User
+users.post("/:userId/category/:categoryId", async (req , res) => {
+  const {userId , categoryId} = req.params
+
+  const addCategory = await addCategoryToUser(userId , categoryId)
+
+  if(addCategory){
+    res.json({message: "Category Added"});
+  } else {
+    res.json({error: "Category not added"})
+  }
+  
+})
+
+
+//Get Categories for User 
+users.get("/:userId/category", async (req , res) => {
   const {userId} = req.params
-  const {categoryId} = req.body
 
-  try{
-    const users = await addCategoryToUser (userId , categoryId)
-    res.status(200).json(users)
-  }
-  catch(error){
-    res.status(500).json({ error: "Server error!" });
-  }
+const userCategory = await getCategoryFromUsers(userId)
+res.json(userCategory)
 
 })
 
+//Delete Categories for User 
+users.delete("/:userId/category/:categoryId", async (req , res) => {
 
-//Delete Category From Users 
-users.delete("/:userId/categories/:categoriesId", async (req , res) => {
-  const {userId, categoriesId} = req.params
+  const {userId , categoryId} = req.params
 
-  const deleteCategory = await deleteCategoryFromUsers(userId, categoriesId)
-  if(deleteCategory > 0){
-    res.status(200).json({ success: true });
-  }
-  else{
-    res.status(404).json({ error: "User category not found!" });
+  const deleteCategory = await deleteCategoryFromUsers(userId , categoryId)
+
+  if(deleteCategory){
+    res.status(200).json(deleteCategory)
   }
 })
+
 
 //Add Event to User 
 users.post("/:userId/events/:eventId", async (req , res) => {
   const {userId , eventId} = req.params
-  const {selected} = req.body
+  
 
-  const addEvent = await addEventsToUser(userId, eventId, selected)
+  const addEvent = await addEventsToUser(userId, eventId)
 
   if(addEvent){
     res.json({message: "Event Added"});
@@ -114,7 +132,7 @@ users.post("/:userId/events/:eventId", async (req , res) => {
 
 })
 
-
+//Get Category From Events
 users.get("/:userId/events", async(req , res) => {
   const {userId} = req.params;
 
@@ -123,7 +141,7 @@ users.get("/:userId/events", async(req , res) => {
 })
 
 
-users.delete("/:userId/event/:eventId", async (req , res) => {
+users.delete("/:userId/events/:eventId", async (req , res) => {
   
 const {userId , eventId} = req.params;
 

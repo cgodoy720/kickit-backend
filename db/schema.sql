@@ -51,9 +51,8 @@ CREATE TABLE events (
 DROP TABLE IF EXISTS users_categories;
 
 CREATE TABLE users_categories (
-    users_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
-    PRIMARY KEY (users_id, category_id)
+    users_id INTEGER,
+    category_id INTEGER
 );
 
 DROP TABLE IF EXISTS events_categories;
@@ -67,7 +66,8 @@ CREATE TABLE events_categories (
 DROP TABLE IF EXISTS users_events;
 CREATE TABLE users_events(
     users_id INTEGER,
-    event_id INTEGER, 
+    event_id INTEGER,
+    selected BOOLEAN DEFAULT FALSE
 );
 
 
@@ -96,7 +96,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_user_events_trigger
+CREATE TRIGGER update_users_events_trigger
 AFTER UPDATE ON events
 FOR EACH ROW
 EXECUTE FUNCTION update_user_events();
