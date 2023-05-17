@@ -51,9 +51,8 @@ CREATE TABLE events (
 DROP TABLE IF EXISTS users_categories;
 
 CREATE TABLE users_categories (
-    users_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
-    PRIMARY KEY (users_id, category_id)
+    users_id INTEGER,
+    category_id INTEGER
 );
 
 DROP TABLE IF EXISTS events_categories;
@@ -67,39 +66,40 @@ CREATE TABLE events_categories (
 DROP TABLE IF EXISTS users_events;
 CREATE TABLE users_events(
     users_id INTEGER,
-    event_id INTEGER 
+    event_id INTEGER,
+    selected BOOLEAN DEFAULT FALSE
 );
 
 
 
-CREATE OR REPLACE FUNCTION update_user_events()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF TG_OP = 'UPDATE' THEN
-        UPDATE users_events
-        SET event_id = NEW.id,
-            title = NEW.title,
-            date_event = NEW.date_event,
-            summary = NEW.summary,
-            max_people = NEW.max_people,
-            age_restriction = NEW.age_restriction,
-            age_min = NEW.age_min,
-            age_max = NEW.age_max,
-            location = NEW.location,
-            address = NEW.address,
-            start_time = NEW.start_time,
-            end_time = NEW.end_time,
-            location_image = NEW.location_image
-        WHERE event_id = OLD.id;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION update_user_events()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     IF TG_OP = 'UPDATE' THEN
+--         UPDATE users_events
+--         SET event_id = NEW.id,
+--             title = NEW.title,
+--             date_event = NEW.date_event,
+--             summary = NEW.summary,
+--             max_people = NEW.max_people,
+--             age_restriction = NEW.age_restriction,
+--             age_min = NEW.age_min,
+--             age_max = NEW.age_max,
+--             location = NEW.location,
+--             address = NEW.address,
+--             start_time = NEW.start_time,
+--             end_time = NEW.end_time,
+--             location_image = NEW.location_image
+--         WHERE event_id = OLD.id;
+--     END IF;
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_user_events_trigger
-AFTER UPDATE ON events
-FOR EACH ROW
-EXECUTE FUNCTION update_user_events();
+-- CREATE TRIGGER update_users_events_trigger
+-- AFTER UPDATE ON events
+-- FOR EACH ROW
+-- EXECUTE FUNCTION update_user_events();
 
 DROP TABLE IF EXISTS users_friends;
 CREATE TABLE users_friends(
@@ -110,26 +110,26 @@ CREATE TABLE users_friends(
 );
 
 
-CREATE OR REPLACE FUNCTION update_users_friends()
-RETURNS TRIGGER AS $$
-BEGIN
-    IF TG_OP = 'UPDATE' THEN
-        UPDATE users_friends
-        SET
-            first_name = NEW.first_name,
-            last_name = NEW.last_name,
-            pronouns = NEW.pronouns,
-            profile_img = NEW.profile_img
-        WHERE users_id = OLD.id;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION update_users_friends()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--     IF TG_OP = 'UPDATE' THEN
+--         UPDATE users_friends
+--         SET
+--             first_name = NEW.first_name,
+--             last_name = NEW.last_name,
+--             pronouns = NEW.pronouns,
+--             profile_img = NEW.profile_img
+--         WHERE users_id = OLD.id;
+--     END IF;
+--     RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_users_friends_trigger
-AFTER UPDATE ON users
-FOR EACH ROW
-EXECUTE FUNCTION update_users_friends();
+-- CREATE TRIGGER update_users_friends_trigger
+-- AFTER UPDATE ON users
+-- FOR EACH ROW
+-- EXECUTE FUNCTION update_users_friends();
 
 
 
