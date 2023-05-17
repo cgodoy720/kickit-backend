@@ -58,7 +58,7 @@ const getEvent = async (id) => {
 
 const createEvent = async (event, categoryNames, creatorUsernames) => {
   try {
-    // Retrieve category IDs
+    // Retrieve category IDs based on names
     const categoryIds = await db.manyOrNone(
       `SELECT id FROM categories WHERE name = ANY($1)`,
       [categoryNames]
@@ -121,6 +121,7 @@ const createEvent = async (event, categoryNames, creatorUsernames) => {
     return error;
   }
 };
+
 
 
 
