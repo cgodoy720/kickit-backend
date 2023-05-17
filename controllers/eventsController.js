@@ -36,23 +36,7 @@ events.get("/", async (req, res) => {
                 isValid = isValid && (matchingCreator !== undefined);
             }
 
-            else if (key === "arrayKey") {
-                // Check if the arrayKey is present in the filters and is an array
-                if (Array.isArray(filters.arrayKey)) {
-                    // Iterate over each filter value for arrayKey
-                    for (const filterValue of filters.arrayKey) {
-                        // Check if any of the filter values match the event's arrayKey
-                        const matchingObject = event.arrayKey.find(obj => {
-                            return obj.property === filterValue;
-                        });
-
-                        isValid = isValid && (matchingObject !== undefined);
-                    }
-                } else {
-                    // If arrayKey is not an array in the filters, consider it invalid
-                    isValid = false;
-                }
-            } else if (isNaN(filters[key])) {
+         else if (isNaN(filters[key])) {
                 isValid = isValid && (event[key].toLowerCase() === filters[key].toLowerCase());
             } else {
                 isValid = isValid && (event[key] == parseInt(filters[key]));

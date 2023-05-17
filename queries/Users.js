@@ -4,25 +4,56 @@ const db = require("../db/dbConfig");
 const getAllUsers = async () => {
   try {
     const allUsers = await db.manyOrNone(`
-      SELECT * FROM users`);
-    return allUsers;
+      SELECT users.*, to_char(age, 'MM/DD/YYYY') AS birthdate, DATE_PART('year', AGE(CURRENT_DATE, age)) AS calculated_age
+      FROM users`);
+
+    const updateUsers = allUsers.map(user => ({
+      ...user,
+      age: {
+        DOB: user.birthdate,
+        age: user.calculated_age
+      },
+      calculated_age: undefined,
+      birthdate: undefined
+    }));
+
+    return updateUsers;
   } catch (error) {
-  
+    console.log(error);
     return error;
   }
 };
+
+
 
 const getUser = async (id) => {
   try {
-    const oneUser = await db.one(`SELECT * FROM users
-    WHERE users.id = $1
-    `, id);
-    return oneUser;
-  } catch (error) {
+    const oneUser = await db.one(
+      `
+      SELECT users.*, to_char(age, 'MM/DD/YYYY') AS birthdate, DATE_PART('year', AGE(CURRENT_DATE, age)) AS calculated_age
+      FROM users
+      WHERE id = $1
+      `,
+      id
+    );
 
+    const updatedUser = {
+      ...oneUser,
+      age: {
+        DOB: oneUser.birthdate,
+        age: oneUser.calculated_age
+      },
+      calculated_age: undefined,
+      birthdate: undefined
+    };
+
+    return updatedUser;
+  } catch (error) {
+    console.log(error);
     return error;
   }
 };
+
 
 const createUser = async (user) => {
   try {
