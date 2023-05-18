@@ -26,15 +26,15 @@ const getAllUsers = async () => {
 
 
 
-const getUser = async (id) => {
+const getUser = async (username) => {
   try {
     const oneUser = await db.one(
       `
       SELECT users.*, to_char(age, 'MM/DD/YYYY') AS birthdate, DATE_PART('year', AGE(CURRENT_DATE, age)) AS calculated_age
       FROM users
-      WHERE id = $1
+      WHERE username = $1
       `,
-      id
+      username
     );
 
     const updatedUser = {
