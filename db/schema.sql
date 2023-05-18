@@ -69,7 +69,9 @@ CREATE TABLE users_events(
     event_id INTEGER,
     interested BOOLEAN DEFAULT FALSE,
     rsvp BOOLEAN DEFAULT FALSE,
-    selected BOOLEAN DEFAULT FALSE
+    selected BOOLEAN DEFAULT FALSE,
+    added Boolean NOT NULL,
+     UNIQUE(users_id, event_id, added)
 );
 
 

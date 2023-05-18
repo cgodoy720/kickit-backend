@@ -142,7 +142,7 @@ const getAllEventsForUsers = async (id) => {
 
 try{
   const eventsByUser = await db.any(
-    `SELECT event_id, users_id, title, location_image, selected, rsvp, interested, to_char(date_event, 'MM/DD/YYYY') AS date_event
+    `SELECT event_id, users_id, title, location_image, selected, added, rsvp, interested, to_char(date_event, 'MM/DD/YYYY') AS date_event
     FROM users_events
     JOIN users ON users.id = users_events.users_id 
     JOIN events ON events.id = users_events.event_id
@@ -160,7 +160,7 @@ catch(error){
 const getUserEventById = async (userId , eventId) => {
   try{
     const eventsByUser = await db.one(
-      `SELECT event_id, users_id, title, location_image, selected, rsvp, interested, to_char(date_event, 'MM/DD/YYYY') AS date_event
+      `SELECT event_id, users_id, title, location_image, selected, added, rsvp, interested, to_char(date_event, 'MM/DD/YYYY') AS date_event
       FROM users_events
       JOIN users ON users.id = users_events.users_id 
       JOIN events ON events.id = users_events.event_id
@@ -179,8 +179,8 @@ const getUserEventById = async (userId , eventId) => {
 const addEventsToUser = async (userId, eventId) => {
   try{
     const add = await db.none(
-      `INSERT INTO users_events (users_id, event_id, selected, interested, rsvp) VALUES($1, $2, $3, $4, $5)`,
-      [userId, eventId, false, false, false]
+      `INSERT INTO users_events (users_id, event_id, selected, interested, rsvp, added) VALUES($1, $2, $3, $4, $5, $6)`,
+      [userId, eventId, false, false, false, true]
     )
     return !add
   }
