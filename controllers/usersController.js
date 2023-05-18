@@ -12,7 +12,8 @@ const {
   addCategoryToUser,
   addEventsToUser,
   getAllEventsForUsers,
-  deleteCategoryFromUsers
+  deleteCategoryFromUsers,
+  updateEventsForUsers
 } = require("../queries/Users");
 
 users.get("/", async (req, res) => {
@@ -150,6 +151,16 @@ const deleteEvent = await deleteEventFromUsers(userId , eventId)
 if(deleteEvent){
   res.status(200).json(deleteEvent)
 }
+
+})
+
+
+users.put("/:userId/events/:eventId", async (req , res) => {
+  const {userId , eventId} = req.params
+
+  const updateEvent = await updateEventsForUsers(req.body, userId, eventId)
+
+  res.json(updateEvent)
 
 })
 

@@ -67,6 +67,8 @@ DROP TABLE IF EXISTS users_events;
 CREATE TABLE users_events(
     users_id INTEGER,
     event_id INTEGER,
+    interested BOOLEAN DEFAULT FALSE,
+    RSVP BOOLEAN DEFAULT FALSE,
     selected BOOLEAN DEFAULT FALSE
 );
 
