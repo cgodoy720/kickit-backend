@@ -16,13 +16,14 @@ CREATE TABLE users(
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
     age DATE NOT NULL,
-    pronouns TEXT,
-    bio VARCHAR(200),
     username VARCHAR(30) UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    profile_img TEXT,
     firebase_id TEXT
 );
+    
+    -- pronouns TEXT,
+    -- bio VARCHAR(200),
+    -- profile_img TEXT,
 
 DROP TABLE IF EXISTS events;
 CREATE TABLE events (
@@ -67,7 +68,11 @@ DROP TABLE IF EXISTS users_events;
 CREATE TABLE users_events(
     users_id INTEGER,
     event_id INTEGER,
-    selected BOOLEAN DEFAULT FALSE
+    interested BOOLEAN DEFAULT FALSE,
+    rsvp BOOLEAN DEFAULT FALSE,
+    selected BOOLEAN DEFAULT FALSE,
+    added Boolean NOT NULL,
+     UNIQUE(users_id, event_id, added)
 );
 
 
