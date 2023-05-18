@@ -139,7 +139,7 @@ const getAllEventsForUsers = async (id) => {
 
 try{
   const eventsByUser = await db.any(
-    `SELECT event_id, users_id, title, location_image, to_char(date_event, 'MM/DD/YYYY') AS date_event
+    `SELECT event_id, users_id, title, location_image, selected, added, rsvp, interested, to_char(date_event, 'MM/DD/YYYY') AS date_event
     FROM users_events
     JOIN users ON users.id = users_events.users_id 
     JOIN events ON events.id = users_events.event_id
@@ -154,12 +154,30 @@ catch(error){
 
 }
 
+const getUserEventById = async (userId , eventId) => {
+  try{
+    const eventsByUser = await db.one(
+      `SELECT event_id, users_id, title, location_image, selected, added, rsvp, interested, to_char(date_event, 'MM/DD/YYYY') AS date_event
+      FROM users_events
+      JOIN users ON users.id = users_events.users_id 
+      JOIN events ON events.id = users_events.event_id
+      WHERE users_events.users_id = $1 AND users_events.event_id =$2`, 
+      [userId , eventId]
+    )
+    return eventsByUser
+  }
+  catch(error){
+    console.log(error)
+    return error
+  }
+}
+
 
 const addEventsToUser = async (userId, eventId) => {
   try{
     const add = await db.none(
-      `INSERT INTO users_events (users_id, event_id, selected) VALUES($1, $2, $3)`,
-      [userId, eventId, false]
+      `INSERT INTO users_events (users_id, event_id, selected, interested, rsvp, added) VALUES($1, $2, $3, $4, $5, $6)`,
+      [userId, eventId, false, false, false, true]
     )
     return !add
   }
@@ -178,6 +196,20 @@ const deleteEventFromUsers = async (userId , eventId) => {
   }
   catch(error){
       return error
+  }
+}
+
+const updateEventsForUsers = async(user, userId, eventId) => {
+  try{
+    const update = await db.one(
+      `UPDATE users_events SET selected=$1, rsvp=$2, interested=$3 WHERE users_id=$4 AND event_id=$5 RETURNING *`,
+      [user.selected, user.rsvp, user.interested, userId, eventId]
+    )
+    return update
+  }
+  catch(error){
+    console.log(error)
+    return error
   }
 }
 
@@ -246,5 +278,7 @@ module.exports = {
   addCategoryToUser,
   addEventsToUser,
   getAllEventsForUsers,
-  deleteCategoryFromUsers
+  deleteCategoryFromUsers,
+  updateEventsForUsers,
+  getUserEventById
 };
