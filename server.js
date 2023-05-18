@@ -1,40 +1,41 @@
-// DEPENDENCIES
-const app = require('./app');
 
-// CONFIGURATION
-require('dotenv').config()
-const PORT = process.env.PORT || 3000
+const express = require("express");
+const socket = require("socket.io");
+const app = express();
+const cors = require("cors");
 
-const http = require('http').Server(app);
+app.use(cors());
+app.use(express.json());
 
-// ATTACH HTTP SERVER TO THE SOCKET.IO
-const io = require('socket.io')(http);
+const server = app.listen("8080", () => {
+  console.log("Server Running on Port 8080...");
+});
 
-// CONNECTION
-app.listen(PORT, (error) => {
-	if(!error)
-		console.log("Server is Successfully Running, and App is listening on port "+ PORT)
-	else
-		console.log("Error occurred, server can't start", error);
+// io = socket(server);
+const io = require("socket.io")(server, {
+	cors: {
+	  origin: "http://localhost:3000",
+	  methods: ["GET", "POST"],
+	  allowedHeaders: ["my-custom-header"],
+	  credentials: true
 	}
-)
-
-// CREATE A NEW CONNECTION
-io.on('connection', socket => {
-  const id = socket.handshake.query.id
-  socket.join(id)
-
-  socket.on('send-message', ({ recipients, text }) => {
-    recipients.forEach(recipient => {
-      const newRecipients = recipients.filter(res => res !== recipient)
-      newRecipients.push(id)
-      io.to(recipient).emit('receive-message', {
-        recipients: newRecipients, sender: id, text
-      });
-    });
   });
 
-  socket.on('error', error => {
-	console.log(`Socket connection error: ${error}`);
+io.on("connection", (socket) => {
+  console.log(socket.id);
+console.log('a user connected')
+  socket.on("join_room", (data) => {
+    socket.join(data);
+    console.log("User Joined Room: " + data);
+  });
+
+  socket.on("send_message", (data) => {
+    console.log(data);
+    socket.to(data.room).emit("receive_message", data.content);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("USER DISCONNECTED");
   });
 });
+
