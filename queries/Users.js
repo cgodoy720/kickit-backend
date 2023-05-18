@@ -157,6 +157,24 @@ catch(error){
 
 }
 
+const getUserEventById = async (userId , eventId) => {
+  try{
+    const eventsByUser = await db.one(
+      `SELECT event_id, users_id, title, location_image, selected, rsvp, interested, to_char(date_event, 'MM/DD/YYYY') AS date_event
+      FROM users_events
+      JOIN users ON users.id = users_events.users_id 
+      JOIN events ON events.id = users_events.event_id
+      WHERE users_events.users_id = $1 AND users_events.event_id =$2`, 
+      [userId , eventId]
+    )
+    return eventsByUser
+  }
+  catch(error){
+    console.log(error)
+    return error
+  }
+}
+
 
 const addEventsToUser = async (userId, eventId) => {
   try{
@@ -264,5 +282,6 @@ module.exports = {
   addEventsToUser,
   getAllEventsForUsers,
   deleteCategoryFromUsers,
-  updateEventsForUsers
+  updateEventsForUsers,
+  getUserEventById
 };

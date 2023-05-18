@@ -13,7 +13,8 @@ const {
   addEventsToUser,
   getAllEventsForUsers,
   deleteCategoryFromUsers,
-  updateEventsForUsers
+  updateEventsForUsers,
+  getUserEventById
 } = require("../queries/Users");
 
 users.get("/", async (req, res) => {
@@ -162,6 +163,19 @@ users.put("/:userId/events/:eventId", async (req , res) => {
 
   res.json(updateEvent)
 
+})
+
+users.get("/:userId/events/:eventId", async (req , res) => {
+  const {userId , eventId} = req.params
+
+  const userEvent = await getUserEventById(userId , eventId)
+
+  if(!userEvent.message){
+    res.json(userEvent)
+  }
+  else{
+    res.status(404).json({error: "not found"})
+  }
 })
 
 module.exports = users;
