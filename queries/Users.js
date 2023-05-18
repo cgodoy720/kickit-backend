@@ -59,16 +59,13 @@ const createUser = async (user) => {
   try {
    
     const newUser = await db.one(
-      "INSERT INTO users (first_name, last_name, age, pronouns, bio, username, email, profile_img, firebase_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+      "INSERT INTO users (first_name, last_name, age, username, email, firebase_id) VALUES ($1, $2, $3, $4, $5, $6 ) RETURNING *",
       [
         user.first_name,
         user.last_name,
         user.age,
-        user.pronouns,
-        user.bio,
         user.username,
         user.email,
-        user.profile_img,
         user.firebase_id,
       ]
     );
