@@ -17,9 +17,9 @@ const {
 
 users.get("/", async (req, res) => {
   const allUsers = await getAllUsers();
-  console.log(allUsers)
+
     if (allUsers[0]) {
-      console.log(allUsers)
+  
         res.status(200).json(allUsers);
     } else {
         res.status(500).json({ error: "server error!"});
@@ -32,9 +32,9 @@ users.get("/:id", async (req, res) => {
   const {id} = req.params
 
   const getUsers = await getUser(id)
-console.log(getUsers)
+
   if(!getUsers.message){
-    console.log(getUsers)
+
     res.json(getUsers)
   }
   else{

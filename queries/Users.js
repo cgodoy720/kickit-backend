@@ -4,25 +4,56 @@ const db = require("../db/dbConfig");
 const getAllUsers = async () => {
   try {
     const allUsers = await db.manyOrNone(`
-      SELECT * FROM users`);
-    return allUsers;
+      SELECT users.*, to_char(age, 'MM/DD/YYYY') AS birthdate, DATE_PART('year', AGE(CURRENT_DATE, age)) AS calculated_age
+      FROM users`);
+
+    const updateUsers = allUsers.map(user => ({
+      ...user,
+      age: {
+        DOB: user.birthdate,
+        age: user.calculated_age
+      },
+      calculated_age: undefined,
+      birthdate: undefined
+    }));
+
+    return updateUsers;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return error;
   }
 };
 
+
+
 const getUser = async (id) => {
   try {
-    const oneUser = await db.one(`SELECT * FROM users
-    WHERE users.id = $1
-    `, id);
-    return oneUser;
+    const oneUser = await db.one(
+      `
+      SELECT users.*, to_char(age, 'MM/DD/YYYY') AS birthdate, DATE_PART('year', AGE(CURRENT_DATE, age)) AS calculated_age
+      FROM users
+      WHERE id = $1
+      `,
+      id
+    );
+
+    const updatedUser = {
+      ...oneUser,
+      age: {
+        DOB: oneUser.birthdate,
+        age: oneUser.calculated_age
+      },
+      calculated_age: undefined,
+      birthdate: undefined
+    };
+
+    return updatedUser;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return error;
   }
 };
+
 
 const createUser = async (user) => {
   try {
@@ -44,7 +75,7 @@ const createUser = async (user) => {
 
     return newUser;
   } catch (error) {
-    console.log(error);
+
     return error;
   }
 };
@@ -82,7 +113,7 @@ const updateUser = async (id, user) => {
     );
     return updatedUser;
   } catch (error) {
-    console.log(error)
+
     return error;
   }
 };
@@ -166,7 +197,7 @@ const getCategoryFromUsers = async (id) => {
     );
     return getCategory;
   } catch (error) {
-    console.log(error);
+
     return error;
   }
 };
@@ -182,7 +213,7 @@ const addCategoryToUser = async (userId, categoryId) => {
     return !add
   }
   catch(error){
-    console.log(error)
+
     return error
   }
 }
@@ -197,84 +228,11 @@ const deleteCategoryFromUsers = async (userId, categoryId) => {
     return deletes
   }
   catch(error){
-    console.log(error)
+
     return error
   }
 }
 
-
-const sendFriendRequest = async (recipientId, senderId, message) => {
-
-  try{
-    const sendRequest = await db.none(
-      `
-    INSERT INTO users_friends (users_id, senders_id, message)
-    VALUES ($1, $2, $3);
-  `, [recipientId, senderId, message]
-    )
-    return sendRequest
-  }
-catch(error){
-  return error
-}
-}
-
-
-const acceptFriendRequest = async (userId, senderId) => {
-  try {
-    await db.task(async (t) => {
-      await t.none(`
-        DELETE FROM users_friends
-        WHERE users_id = $1 AND senders_id = $2;
-      `, [userId, senderId]);
-
-      await t.none(`
-        INSERT INTO users_friends (users_id, senders_id)
-        VALUES ($1, $2);
-      `, [userId, senderId]);
-    });
-  } catch (error) {
-    throw error;
-  }
-};
-
-const deleteFriendRequest = async (userId, senderId) => {
-  try {
-    await db.none(`
-      DELETE FROM users_friends
-      WHERE users_id = $1 AND senders_id = $2;
-    `, [userId, senderId]);
-  } catch (error) {
-    throw error;
-  }
-};
-
-const getFriendsList = async (userId) => {
-  try{
-    return await db.any(`
-      SELECT u.id, u.first_name, u.last_name
-      FROM users u
-      INNER JOIN users_friends uf ON u.id = uf.users_id
-      WHERE uf.senders_id = $1;
-    `, [userId]);
-  }
-  catch(error){
-    return error
-  }
-}
-
-const getFriendRequests = async (userId) => {
-  try {
-    return await db.any(`
-      SELECT u.id, u.first_name, u.last_name, uf.message
-      FROM users u
-      INNER JOIN users_friends uf ON u.id = uf.senders_id
-      WHERE uf.users_id = $1;
-    `, [userId]);
-  } catch (error) {
-    throw error;
-  }
-};
 
 
 
