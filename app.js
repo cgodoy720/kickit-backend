@@ -28,7 +28,7 @@ app.use("/events", eventsController);
 
 app.use("/category", categoryController)
 
-app.use("/users", userController, friendsController)
+app.use("/users", userController)
 
 app.get('*', (req, res) => {
     res.status(404).send('Not Found')
