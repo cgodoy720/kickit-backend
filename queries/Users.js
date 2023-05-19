@@ -232,12 +232,28 @@ const getCategoryFromUsers = async (id) => {
   }
 };
 
+const getCategoryFromUserByIndex = async(userId, categoryId) => {
+  try{
+    const getCategory = await db.one(
+      `SELECT users_categories.users_id, added, users_categories.category_id, categories.name
+      FROM users_categories
+      JOIN categories ON categories.id = users_categories.category_id
+      JOIN users ON users.id = users_categories.users_id
+      WHERE users.id = $1 AND category_id =$2`,
+       [userId , categoryId])
+       return getCategory
+  }
+
+  catch(error){
+    console.log(error)
+  }
+}
 
 
 const addCategoryToUser = async (userId, categoryId) => {
   try{
     const add = await db.none(
-      `INSERT INTO users_categories (users_id, category_id added) VALUES($1 , $2, $3)`,
+      `INSERT INTO users_categories (users_id, category_id, added) VALUES($1 , $2, $3)`,
       [userId , categoryId, true]
     )
     return !add
@@ -281,5 +297,6 @@ module.exports = {
   getAllEventsForUsers,
   deleteCategoryFromUsers,
   updateEventsForUsers,
-  getUserEventById
+  getUserEventById,
+  getCategoryFromUserByIndex
 };

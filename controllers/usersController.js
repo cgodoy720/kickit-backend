@@ -14,7 +14,8 @@ const {
   getAllEventsForUsers,
   deleteCategoryFromUsers,
   updateEventsForUsers,
-  getUserEventById
+  getUserEventById,
+  getCategoryFromUserByIndex
 } = require("../queries/Users");
 
 users.get("/", async (req, res) => {
@@ -172,6 +173,20 @@ users.get("/:userId/events/:eventId", async (req , res) => {
 
   if(!userEvent.message){
     res.json(userEvent)
+  }
+  else{
+    res.status(404).json({error: "not found"})
+  }
+})
+
+
+users.get("/:userId/category/:categoryId", async (req , res) => {
+  const {userId , categoryId} = req.params
+
+  const getCategory = await getCategoryFromUserByIndex(userId , categoryId)
+
+  if(!getCategory.message){
+    res.json(getCategory)
   }
   else{
     res.status(404).json({error: "not found"})
