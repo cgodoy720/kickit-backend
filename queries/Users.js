@@ -59,7 +59,7 @@ const createUser = async (user) => {
   try {
    
     const newUser = await db.one(
-      "INSERT INTO users (first_name, last_name, age, username, email, firebase_id) VALUES ($1, $2, $3, $4, $5, $6 ) RETURNING *",
+      "INSERT INTO users (first_name, last_name, age, username, email, firebase_id, pronouns, bio, profile_img) VALUES ($1, $2, $3, $4, $5, $6 , $7, $8, $9) RETURNING *",
       [
         user.first_name,
         user.last_name,
@@ -67,12 +67,15 @@ const createUser = async (user) => {
         user.username,
         user.email,
         user.firebase_id,
+        user.pronouns,
+        user.bio,
+        user.profile_img
       ]
     );
 
     return newUser;
   } catch (error) {
-
+    console.log(error)
     return error;
   }
 };
@@ -94,18 +97,16 @@ const deleteUser = async (id) => {
 const updateUser = async (id, user) => {
   try {
     const updatedUser = await db.one(
-      "UPDATE users SET first_name=$1, last_name=$2, age=$3, pronouns=$4, bio=$5, username=$6, email=$7, profile_img=$8, firebase_id=$9 WHERE id=$10 RETURNING *",
+      "UPDATE users SET first_name=$1, last_name=$2, username=$3, email=$4 , pronouns=$5, bio=$6, profile_img=$7 WHERE id=$8 RETURNING *",
       [
         user.first_name,
         user.last_name,
-        user.age,
-        user.pronouns,
-        user.bio,
         user.username,
         user.email,
+        user.pronouns,
+        user.bio,
         user.profile_img,
-        user.firebase_id,
-        id,
+        id
       ]
     );
     return updatedUser;
@@ -217,7 +218,7 @@ const updateEventsForUsers = async(user, userId, eventId) => {
 const getCategoryFromUsers = async (id) => {
   try {
     const getCategory = await db.any(
-      `SELECT users_categories.users_id, users_categories.category_id, categories.name
+      `SELECT users_categories.users_id, added, users_categories.category_id, categories.name
       FROM users_categories
       JOIN categories ON categories.id = users_categories.category_id
       JOIN users ON users.id = users_categories.users_id
@@ -236,8 +237,8 @@ const getCategoryFromUsers = async (id) => {
 const addCategoryToUser = async (userId, categoryId) => {
   try{
     const add = await db.none(
-      `INSERT INTO users_categories (users_id, category_id) VALUES($1 , $2)`,
-      [userId , categoryId]
+      `INSERT INTO users_categories (users_id, category_id added) VALUES($1 , $2, $3)`,
+      [userId , categoryId, true]
     )
     return !add
   }
