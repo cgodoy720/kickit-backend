@@ -18,12 +18,12 @@ CREATE TABLE users(
     age DATE NOT NULL,
     username VARCHAR(30) UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
+    pronouns TEXT,
+    bio VARCHAR(200),
+    profile_img TEXT,
     firebase_id TEXT
 );
-    
-    -- pronouns TEXT,
-    -- bio VARCHAR(200),
-    -- profile_img TEXT,
+
 
 DROP TABLE IF EXISTS events;
 CREATE TABLE events (
@@ -53,7 +53,9 @@ DROP TABLE IF EXISTS users_categories;
 
 CREATE TABLE users_categories (
     users_id INTEGER,
-    category_id INTEGER
+    category_id INTEGER,
+    added BOOLEAN NOT NULL,
+    UNIQUE (users_id, category_id, added)
 );
 
 DROP TABLE IF EXISTS events_categories;
@@ -77,34 +79,27 @@ CREATE TABLE users_events(
 
 
 
--- CREATE OR REPLACE FUNCTION update_user_events()
--- RETURNS TRIGGER AS $$
--- BEGIN
---     IF TG_OP = 'UPDATE' THEN
---         UPDATE users_events
---         SET event_id = NEW.id,
---             title = NEW.title,
---             date_event = NEW.date_event,
---             summary = NEW.summary,
---             max_people = NEW.max_people,
---             age_restriction = NEW.age_restriction,
---             age_min = NEW.age_min,
---             age_max = NEW.age_max,
---             location = NEW.location,
---             address = NEW.address,
---             start_time = NEW.start_time,
---             end_time = NEW.end_time,
---             location_image = NEW.location_image
---         WHERE event_id = OLD.id;
---     END IF;
---     RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql;
+CREATE OR REPLACE FUNCTION update_user_events()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'UPDATE' THEN
+        UPDATE users_events
+        SET event_id = NEW.id,
+            title = NEW.title,
+            date_event = NEW.date_event,
+            location = NEW.location,
+            address = NEW.address,
+            location_image = NEW.location_image
+        WHERE event_id = OLD.id;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
--- CREATE TRIGGER update_users_events_trigger
--- AFTER UPDATE ON events
--- FOR EACH ROW
--- EXECUTE FUNCTION update_user_events();
+CREATE TRIGGER update_users_events_trigger
+AFTER UPDATE ON events
+FOR EACH ROW
+EXECUTE FUNCTION update_user_events();
 
 DROP TABLE IF EXISTS users_friends;
 CREATE TABLE users_friends(
