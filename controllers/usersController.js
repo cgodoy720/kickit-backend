@@ -29,11 +29,11 @@ users.get("/", async (req, res) => {
 });
 
 
-users.get("/:id", async (req, res) => {
+users.get("/:username", async (req, res) => {
 
-  const {id} = req.params
+  const {username} = req.params
 
-  const getUsers = await getUser(id)
+  const getUsers = await getUser(username)
 
   if(!getUsers.message){
 
