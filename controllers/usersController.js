@@ -18,6 +18,8 @@ const {
   getCategoryFromUserByIndex
 } = require("../queries/Users");
 
+const {checkAge} = require("../middleware/usersValidation")
+
 users.get("/", async (req, res) => {
   const allUsers = await getAllUsers();
 
@@ -54,7 +56,7 @@ users.get("/firebase/:id", async (req, res) => {
   }
 });
 
-users.post("/", async (req, res) => {
+users.post("/", checkAge ,async (req, res) => {
   try {
     const user = await createUser(req.body);
     res.status(200).json(user);
