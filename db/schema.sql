@@ -55,7 +55,7 @@ CREATE TABLE users_categories (
     users_id INTEGER,
     category_id INTEGER,
     added BOOLEAN NOT NULL,
-    UNIQUE (users_id, category_id, added)
+    UNIQUE (users_id, category_id)
 );
 
 DROP TABLE IF EXISTS events_categories;
