@@ -15,7 +15,8 @@ const {
   deleteCategoryFromUsers,
   updateEventsForUsers,
   getUserEventById,
-  getCategoryFromUserByIndex
+  getCategoryFromUserByIndex,
+  getUserAttendingSameEvent
 } = require("../queries/Users");
 
 const {checkAge} = require("../middleware/usersValidation")
@@ -195,4 +196,29 @@ users.get("/:userId/category/:categoryId", async (req , res) => {
   }
 })
 
+
+users.get("/:eventId/attending", async (req, res) => {
+  const { eventId } = req.params;
+
+  const getAttending = await getUserAttendingSameEvent(eventId);
+
+  const filter = req.query;
+
+  const filterAttending = getAttending.filter((event) => {
+    let isValid = true;
+    for (key in filter) {
+      if (isNaN(filter[key])) {
+        isValid = isValid && (String(event[key]).toLowerCase() === filter[key].toLowerCase());
+      } else {
+        isValid = isValid && (event[key] == parseInt(filter[key]));
+      }
+    }
+    return isValid;
+  });
+
+  res.json(filterAttending);
+});
+
+
 module.exports = users;
+

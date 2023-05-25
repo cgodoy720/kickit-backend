@@ -1,4 +1,3 @@
-
 const db = require("../db/dbConfig");
 
 const getAllUsers = async () => {
@@ -275,6 +274,20 @@ const deleteCategoryFromUsers = async (userId, categoryId) => {
   }
 }
 
+const getUserAttendingSameEvent = async (eventId) => {
+  try {
+    const attending = await db.any(
+      `SELECT username, profile_img, rsvp, interested
+      FROM users 
+      JOIN users_events ON users.id = users_events.users_id
+      WHERE users_events.event_id = $1`,
+      eventId
+    );
+    return attending;
+  } catch (error) {
+    return error;
+  }
+};
 
 
 
@@ -294,5 +307,6 @@ module.exports = {
   deleteCategoryFromUsers,
   updateEventsForUsers,
   getUserEventById,
-  getCategoryFromUserByIndex
+  getCategoryFromUserByIndex,
+  getUserAttendingSameEvent
 };
