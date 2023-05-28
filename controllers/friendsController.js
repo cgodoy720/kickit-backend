@@ -11,16 +11,19 @@ friends.post("/", async (req, res) => {
       const request = await sendFriendRequest(req.body);
       res.json(request);
     } catch (error) {
+      console.log(error)
       res.status(400).json({ error: error.message });
     }
   });
   
-  friends.post("/accept", async (req, res) => {
+  friends.post("/:userId/accept/:senderId", async (req, res) => {
+    const { userId, senderId } = req.params;
     try {
-      const accept = await acceptFriendRequest(req.body);
+      const accept = await acceptFriendRequest(userId, senderId);
       res.json(accept);
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      console.log(error);
+      res.status(404).json("Can't Accept Request")
     }
   });
   
