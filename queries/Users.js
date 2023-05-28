@@ -1,4 +1,3 @@
-
 const db = require("../db/dbConfig");
 
 const getAllUsers = async () => {
@@ -116,21 +115,32 @@ const updateUser = async (id, user) => {
   }
 };
 
+
+
 const getUserByFirebaseId = async (firebase_id) => {
-  try {
-    const user = await db.one(
-      `SELECT users.*, 
-      array_agg(json_build_object('id', categories.id, 'name', categories.name)) AS category_names 
+   try {
+    const oneUser = await db.one(
+      `
+      SELECT users.*, to_char(age, 'MM/DD/YYYY') AS birthdate, DATE_PART('year', AGE(CURRENT_DATE, age)) AS calculated_age
       FROM users
-      JOIN users_categories ON users.id = users_categories.users_id
-      JOIN categories ON categories.id = users_categories.event_id
-      WHERE users.firebase_id  = $1
-      GROUP BY users.id
-      HAVING count(*) > 1 OR COUNT(users_categories.users_id) = 1
-      `, firebase_id
+      WHERE firebase_id = $1
+      `,
+      firebase_id
     );
-    return user;
+
+    const updatedUser = {
+      ...oneUser,
+      age: {
+        DOB: oneUser.birthdate,
+        age: oneUser.calculated_age
+      },
+      calculated_age: undefined,
+      birthdate: undefined
+    };
+
+    return updatedUser;
   } catch (error) {
+    console.log(error);
     return error;
   }
 };
@@ -275,6 +285,20 @@ const deleteCategoryFromUsers = async (userId, categoryId) => {
   }
 }
 
+const getUserAttendingSameEvent = async (eventId) => {
+  try {
+    const attending = await db.any(
+      `SELECT username, profile_img, rsvp, interested
+      FROM users 
+      JOIN users_events ON users.id = users_events.users_id
+      WHERE users_events.event_id = $1`,
+      eventId
+    );
+    return attending;
+  } catch (error) {
+    return error;
+  }
+};
 
 
 
@@ -294,5 +318,6 @@ module.exports = {
   deleteCategoryFromUsers,
   updateEventsForUsers,
   getUserEventById,
-  getCategoryFromUserByIndex
+  getCategoryFromUserByIndex,
+  getUserAttendingSameEvent
 };

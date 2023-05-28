@@ -1,10 +1,10 @@
 const db = require("../db/dbConfig");
 
-const sendFriendRequest = async (recipientId, senderId, message) => {
+const sendFriendRequest = async (request) => {
   try {
     const getUserId = await db.one(
       `SELECT * FROM users_friends WHERE users_id = $1`,
-      [recipientId]
+      [request.users_id]
     );
 
     if (getUserId) {
@@ -15,7 +15,7 @@ const sendFriendRequest = async (recipientId, senderId, message) => {
         INSERT INTO users_friends (users_id, senders_id, message)
         VALUES ($1, $2, $3);
       `,
-        [recipientId, senderId, message]
+        [request.users_id, request.senders_id, request.message]
       );
       return sendRequest;
     }
@@ -25,18 +25,18 @@ const sendFriendRequest = async (recipientId, senderId, message) => {
 };
   
   
-  const acceptFriendRequest = async (userId, senderId) => {
+  const acceptFriendRequest = async (accept) => {
     try {
       await db.task(async (t) => {
         await t.none(`
           DELETE FROM users_friends
           WHERE users_id = $1 AND senders_id = $2;
-        `, [userId, senderId]);
+        `, [accept.users_id, accept.senders_id]);
   
         await t.none(`
           INSERT INTO users_friends (users_id, senders_id)
           VALUES ($1, $2);
-        `, [userId, senderId]);
+        `, [accept.users_id, accept.senders_id]);
       });
     } catch (error) {
       throw error;
