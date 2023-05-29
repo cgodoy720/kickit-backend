@@ -40,6 +40,8 @@ CREATE TABLE events (
     CHECK(age_min <= age_max),
     location TEXT NOT NULL,
     address TEXT NOT NULL,
+    latitude INTEGER NOT NULL,
+    longitude INTEGER NOT NULL,
     start_time time,
     end_time time,
     CONSTRAINT check_end_after_start CHECK (end_time > start_time),
