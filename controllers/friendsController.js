@@ -3,7 +3,7 @@ const express = require("express");
 
 const friends = express.Router()
 
-const {sendFriendRequest , acceptFriendRequest , deleteFriendRequest, getFriendsList, getFriendRequests } = require("../queries/Friends")
+const {sendFriendRequest , acceptFriendRequest , deleteFriendRequest, getFriendsList, getFriendRequests, deleteFriends } = require("../queries/Friends")
 
 
 friends.post("/", async (req, res) => {
@@ -71,6 +71,21 @@ friends.get(`/:userId/request`, async (req ,res) => {
     else{
       res.status(404).json({error: "not found"})
     }
+
+})
+
+friends.delete(`/:userId/deletefriend/:friendId`, async(req , res) => {
+
+const {userId , friendId} = req.params
+
+const deleteFriend = await deleteFriends(userId, friendId)
+
+if(deleteFriend){
+  res.status(200).json(deleteFriend)
+}
+else{
+  res.status(404).json(`Can not found friend`)
+}
 
 })
 
