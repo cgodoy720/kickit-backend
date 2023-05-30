@@ -3,7 +3,7 @@ const express = require("express");
 
 const friends = express.Router()
 
-const {sendFriendRequest , acceptFriendRequest , deleteFriendRequest, getFriendsList, getFriendRequests } = require("../queries/Friends")
+const {sendFriendRequest , acceptFriendRequest , deleteFriendRequest, getFriendsList, getFriendRequests, deleteFriends } = require("../queries/Friends")
 
 
 friends.post("/", async (req, res) => {
@@ -11,16 +11,19 @@ friends.post("/", async (req, res) => {
       const request = await sendFriendRequest(req.body);
       res.json(request);
     } catch (error) {
+      console.log(error)
       res.status(400).json({ error: error.message });
     }
   });
   
-  friends.post("/accept", async (req, res) => {
+  friends.post("/:userId/accept/:senderId", async (req, res) => {
+    const { userId, senderId } = req.params;
     try {
-      const accept = await acceptFriendRequest(req.body);
+      const accept = await acceptFriendRequest(userId, senderId);
       res.json(accept);
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      console.log(error);
+      res.status(404).json("Can't Accept Request")
     }
   });
   
@@ -42,16 +45,25 @@ friends.post("/", async (req, res) => {
   
 
   friends.get(`/:userId/list`, async (req ,res) => {
-      const {userId} = req.params
+    const {userId} = req.params
 
-      const getFriends = await getFriendsList(userId)
+    const getFriends = await getFriendsList(userId)
 
-      if(!getFriends.message){
-          res.json(getFriends)
+    const filter = req.query
+
+    const filterFriends = getFriends.filter((req) => {
+      let isValid = true
+      for(key in filter){
+        if(isNaN(filter[key])){
+          isValid = isValid && (req[key].toLowerCase() === filter[key].toLowerCase())
+        }
+        else{
+          isValid = isValid && (req[key] == parseInt(filter[key]))
+        }
       }
-      else{
-        res.status(404).json({error: "not found"})
-      }
+      return isValid
+    })
+    res.json(filterFriends)
       
   })
 
@@ -62,12 +74,35 @@ friends.get(`/:userId/request`, async (req ,res) => {
 
     const getRequest = await getFriendRequests(userId)
 
-    if(!getRequest.message){
-        res.json(getRequest)
-    }
-    else{
-      res.status(404).json({error: "not found"})
-    }
+    const filter = req.query
+
+    const filterRequest = getRequest.filter((req) => {
+      let isValid = true
+      for(key in filter){
+        if(isNaN(filter[key])){
+          isValid = isValid && (req[key].toLowerCase() === filter[key].toLowerCase())
+        }
+        else{
+          isValid = isValid && (req[key] == parseInt(filter[key]))
+        }
+      }
+      return isValid
+    })
+    res.json(filterRequest)
+})
+
+friends.delete(`/:userId/deletefriend/:friendId`, async(req , res) => {
+
+const {userId , friendId} = req.params
+
+const deleteFriend = await deleteFriends(userId, friendId)
+
+if(deleteFriend){
+  res.status(200).json(deleteFriend)
+}
+else{
+  res.status(404).json(`Can not found friend`)
+}
 
 })
 

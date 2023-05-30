@@ -73,8 +73,8 @@ const createEvent = async (event, categoryNames, creatorUsernames) => {
     // Insert new event into events table
     const newEvent = await db.one(
       `INSERT INTO events (title, date_event, summary,
-         max_people, age_restriction, age_min, age_max, location, address, start_time, end_time, location_image, creator)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+         max_people, age_restriction, age_min, age_max, location, address, latitude, longitude, start_time, end_time, location_image, creator)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
        RETURNING *`,
       [
         event.title,
@@ -86,6 +86,8 @@ const createEvent = async (event, categoryNames, creatorUsernames) => {
         event.age_max,
         event.location,
         event.address,
+        event.latitude,
+        event.longitude,
         event.start_time,
         event.end_time,
         event.location_image,

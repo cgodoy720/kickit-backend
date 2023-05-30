@@ -40,6 +40,8 @@ CREATE TABLE events (
     CHECK(age_min <= age_max),
     location TEXT NOT NULL,
     address TEXT NOT NULL,
+    latitude INTEGER NOT NULL,
+    longitude INTEGER NOT NULL,
     start_time time,
     end_time time,
     CONSTRAINT check_end_after_start CHECK (end_time > start_time),
@@ -101,12 +103,21 @@ AFTER UPDATE ON events
 FOR EACH ROW
 EXECUTE FUNCTION update_user_events();
 
-DROP TABLE IF EXISTS users_friends;
-CREATE TABLE users_friends(
+DROP TABLE IF EXISTS users_request;
+CREATE TABLE users_request(
     users_id INTEGER, 
     senders_id INTEGER,
     message TEXT,
     PRIMARY KEY(users_id , senders_id)
+);
+
+DROP TABLE IF EXISTS users_friends;
+CREATE TABLE users_friends(
+    users_id INTEGER,
+    friends_id INTEGER,
+    PRIMARY KEY(users_id, friends_id),
+    FOREIGN KEY(users_id) REFERENCES users(id),
+    FOREIGN KEY(friends_id) REFERENCES users(id)
 );
 
 
