@@ -45,16 +45,25 @@ friends.post("/", async (req, res) => {
   
 
   friends.get(`/:userId/list`, async (req ,res) => {
-      const {userId} = req.params
+    const {userId} = req.params
 
-      const getFriends = await getFriendsList(userId)
+    const getFriends = await getFriendsList(userId)
 
-      if(!getFriends.message){
-          res.json(getFriends)
+    const filter = req.query
+
+    const filterFriends = getFriends.filter((req) => {
+      let isValid = true
+      for(key in filter){
+        if(isNaN(filter[key])){
+          isValid = isValid && (req[key].toLowerCase() === filter[key].toLowerCase())
+        }
+        else{
+          isValid = isValid && (req[key] == parseInt(filter[key]))
+        }
       }
-      else{
-        res.status(404).json({error: "not found"})
-      }
+      return isValid
+    })
+    res.json(filterFriends)
       
   })
 
@@ -65,13 +74,21 @@ friends.get(`/:userId/request`, async (req ,res) => {
 
     const getRequest = await getFriendRequests(userId)
 
-    if(!getRequest.message){
-        res.json(getRequest)
-    }
-    else{
-      res.status(404).json({error: "not found"})
-    }
+    const filter = req.query
 
+    const filterRequest = getRequest.filter((req) => {
+      let isValid = true
+      for(key in filter){
+        if(isNaN(filter[key])){
+          isValid = isValid && (req[key].toLowerCase() === filter[key].toLowerCase())
+        }
+        else{
+          isValid = isValid && (req[key] == parseInt(filter[key]))
+        }
+      }
+      return isValid
+    })
+    res.json(filterRequest)
 })
 
 friends.delete(`/:userId/deletefriend/:friendId`, async(req , res) => {

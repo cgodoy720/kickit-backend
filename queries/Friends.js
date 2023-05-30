@@ -12,10 +12,10 @@ const sendFriendRequest = async (request) => {
     } else {
       const sendRequest = await db.none(
         `
-        INSERT INTO users_request (users_id, senders_id, message)
-        VALUES ($1, $2, $3);
+        INSERT INTO users_request (users_id, senders_id)
+        VALUES ($1, $2);
       `,
-        [request.users_id, request.senders_id, request.message]
+        [request.users_id, request.senders_id]
       );
       return sendRequest;
     }
@@ -113,7 +113,7 @@ const acceptFriendRequest = async (userId, senderId) => {
   const getFriendRequests = async (userId) => {
     try {
       return await db.any(`
-        SELECT u.id, u.first_name, u.last_name, uq.message
+        SELECT u.id, u.first_name, u.last_name
         FROM users u
         INNER JOIN users_request uq ON u.id = uq.senders_id
         WHERE uq.users_id = $1;
