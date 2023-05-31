@@ -56,23 +56,33 @@ const getUser = async (username) => {
 
 const createUser = async (user) => {
   try {
-   
-    const newUser = await db.one(
-      "INSERT INTO users (first_name, last_name, age, username, email, firebase_id, pronouns, bio, profile_img) VALUES ($1, $2, $3, $4, $5, $6 , $7, $8, $9) RETURNING *",
-      [
-        user.first_name,
-        user.last_name,
-        user.age,
-        user.username,
-        user.email,
-        user.firebase_id,
-        user.pronouns,
-        user.bio,
-        user.profile_img
-      ]
-    );
-
-    return newUser;
+    
+    const getUserName = await db.oneOrNone(
+      `SELECT username FROM users WHERE username =$1`,
+      user.username
+    )
+    
+    if(getUserName){
+      return { error: 'Duplicate username found!' };
+    }
+    else{
+      const newUser = await db.one(
+        "INSERT INTO users (first_name, last_name, age, username, email, firebase_id, pronouns, bio, profile_img) VALUES ($1, $2, $3, $4, $5, $6 , $7, $8, $9) RETURNING *",
+        [
+          user.first_name,
+          user.last_name,
+          user.age,
+          user.username,
+          user.email,
+          user.firebase_id,
+          user.pronouns,
+          user.bio,
+          user.profile_img
+        ]
+      );
+  
+      return newUser;
+    }
   } catch (error) {
     console.log(error)
     return error;

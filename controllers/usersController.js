@@ -21,15 +21,29 @@ const {
 
 const {checkAge} = require("../middleware/usersValidation")
 
-users.get("/", async (req, res) => {
-  const allUsers = await getAllUsers();
 
-    if (allUsers[0]) {
-  
-        res.status(200).json(allUsers);
-    } else {
-        res.status(500).json({ error: "server error!"});
+users.get("/", async (req, res) => {
+
+const getUsers = await getAllUsers()
+
+const filter = req.query
+
+const filterUsers = getUsers.filter((req) => {
+  let isValid = true
+  for(key in filter){
+    if(isNaN(filter[key])){
+      isValid = isValid && (req[key].toLowerCase() === filter[key].toLowerCase())
     }
+    else{
+      isValid = isValid && (req[key] == parseInt(filter[key]))
+    }
+  }
+  return isValid
+})
+res.json(filterUsers)
+
+
+   
 });
 
 
