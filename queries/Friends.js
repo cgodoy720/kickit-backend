@@ -86,7 +86,7 @@ const acceptFriendRequest = async (userId, senderId) => {
   
   const deleteFriendRequest = async (userId, senderId) => {
     try {
-      await db.any(`
+      await db.none(`
         DELETE FROM users_request
         WHERE users_id = $1 AND senders_id = $2;
       `, [userId, senderId]);
@@ -99,7 +99,7 @@ const acceptFriendRequest = async (userId, senderId) => {
   const getFriendsList = async (userId) => {
     try{
       return await db.any(`
-        SELECT u.id, u.first_name, u.last_name, u.profile_img, u.pronouns
+        SELECT u.id, u.first_name, u.last_name, u.profile_img, u.pronouns, u.username
         FROM users u
         INNER JOIN users_friends uf ON u.id = uf.friends_id
         WHERE uf.users_id = $1;
@@ -113,7 +113,7 @@ const acceptFriendRequest = async (userId, senderId) => {
   const getFriendRequests = async (userId) => {
     try {
       return await db.any(`
-        SELECT u.id, u.first_name, u.last_name
+        SELECT u.id, u.first_name, u.last_name, u.profile_img
         FROM users u
         INNER JOIN users_request uq ON u.id = uq.senders_id
         WHERE uq.users_id = $1;
