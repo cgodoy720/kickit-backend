@@ -106,7 +106,7 @@ const deleteUser = async (id) => {
 const updateUser = async (id, user) => {
   try {
     const updatedUser = await db.one(
-      "UPDATE users SET first_name=$1, last_name=$2, username=$3, email=$4 , pronouns=$5, bio=$6, profile_img=$7 WHERE id=$8 RETURNING *",
+      "UPDATE users SET first_name=$1, last_name=$2, username=$3, email=$4, pronouns=$5, bio=$6, profile_img=$7 WHERE id=$8 RETURNING *",
       [
         user.first_name,
         user.last_name,
@@ -118,9 +118,10 @@ const updateUser = async (id, user) => {
         id
       ]
     );
+    
     return updatedUser;
   } catch (error) {
-
+    console.log(error);
     return error;
   }
 };
