@@ -190,6 +190,7 @@ const updateEvent = async(id , event) => {
   return updatedEvent
   }
   catch(error){
+    console.log(error)
     return error
   }
   

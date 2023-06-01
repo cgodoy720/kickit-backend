@@ -72,6 +72,11 @@ DROP TABLE IF EXISTS users_events;
 CREATE TABLE users_events(
     users_id INTEGER,
     event_id INTEGER,
+    title TEXT,
+    date_event TEXT,
+    location TEXT,
+    address TEXT,
+    location_image TEXT,
     interested BOOLEAN DEFAULT FALSE,
     rsvp BOOLEAN DEFAULT FALSE,
     selected BOOLEAN DEFAULT FALSE,
@@ -86,7 +91,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     IF TG_OP = 'UPDATE' THEN
         UPDATE users_events
-        SET event_id = NEW.id,
+        SET
             title = NEW.title,
             date_event = NEW.date_event,
             location = NEW.location,

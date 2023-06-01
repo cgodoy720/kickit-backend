@@ -118,7 +118,7 @@ const updateUser = async (id, user) => {
         id
       ]
     );
-    
+
     return updatedUser;
   } catch (error) {
     console.log(error);
@@ -158,23 +158,22 @@ const getUserByFirebaseId = async (firebase_id) => {
 
 
 const getAllEventsForUsers = async (id) => {
+  try {
+    const eventsByUser = await db.any(
+      `SELECT ue.event_id, ue.users_id, e.title, e.location_image, ue.selected, ue.added, ue.rsvp, ue.interested, to_char(e.date_event, 'MM/DD/YYYY') AS date_event
+       FROM users_events ue
+       JOIN users u ON u.id = ue.users_id 
+       JOIN events e ON e.id = ue.event_id
+       WHERE ue.users_id = $1`,
+      id
+    );
+    return eventsByUser;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
 
-try{
-  const eventsByUser = await db.any(
-    `SELECT event_id, users_id, title, location_image, selected, added, rsvp, interested, to_char(date_event, 'MM/DD/YYYY') AS date_event
-    FROM users_events
-    JOIN users ON users.id = users_events.users_id 
-    JOIN events ON events.id = users_events.event_id
-    WHERE users_events.users_id = $1`, id
-  )
-  return eventsByUser
-}
-catch(error){
-  console.log(error)
-  return error
-}
-
-}
 
 const getUserEventById = async (userId , eventId) => {
   try{
