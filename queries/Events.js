@@ -181,7 +181,7 @@ const updateEvent = async(id , event) => {
     `
     UPDATE events SET title=$1, date_event=$2, summary=$3, max_people=$4, age_restriction=$5, 
     age_min=$6, age_max=$7, location=$8, 
-    address=$9, start_time=$10, end_time=$11, location_image=12 WHERE id=$13 RETURNING *`,
+    address=$9, start_time=$10, end_time=$11, location_image=$12 WHERE id=$13 RETURNING *`,
 
     [event.title , event.date_event, event.summary, event.max_people, event.age_restriction
     ,event.age_min, event.age_max, event.location, 
