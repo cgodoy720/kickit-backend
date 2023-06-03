@@ -50,7 +50,6 @@ CREATE TABLE events (
 );
 
 
-
 DROP TABLE IF EXISTS users_categories;
 
 CREATE TABLE users_categories (
@@ -122,6 +121,7 @@ CREATE TABLE users_friends(
     friends_id INTEGER,
     first_name VARCHAR(30),
     last_name VARCHAR(30),
+    username VARCHAR(30),
     pronouns TEXT,
     profile_img TEXT,
     PRIMARY KEY(users_id, friends_id),
@@ -152,6 +152,16 @@ CREATE TRIGGER update_users_friends_trigger
 AFTER UPDATE ON users
 FOR EACH ROW
 EXECUTE FUNCTION update_users_friends();
+
+
+DROP TABLE IF EXISTS events_cohost;
+CREATE TABLE events_cohost (
+    user_id INTEGER,
+    event_id INTEGER,
+    PRIMARY KEY (user_id, event_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
+);
 
 
 

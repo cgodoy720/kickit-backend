@@ -10,7 +10,9 @@ const { getAllEvents,
     deleteEvent, 
     addCategory,
     deleteCategoryFromEvent,
-    updateEvent } = require("../queries/Events");
+    updateEvent,
+    createCohost,
+    getCoHost } = require("../queries/Events");
 
 
 events.use("/:eventId/comments", comm)
@@ -126,6 +128,35 @@ events.put("/:id", async (req , res) => {
     res.status(200).json(updatedEvent);
 })
 
+//Add a co-host to an event
+events.post(`/:userId/cohost/:eventId`, async (req, res) => {
+    try {
+      const { userId, eventId } = req.params;
+      const host = await createCohost(userId, eventId);
+      res.status(200).json(host);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "User not found" });
+    }
+  });
+  
+  //Getting all the events co-host
+  events.get(`/:eventId/hosts`, async (req, res) => {
+    try {
+      const { eventId } = req.params;
+      const hosts = await getCoHost(eventId);
+  
+      if (hosts.length > 0) {
+        res.json(hosts);
+      } else {
+        res.status(404).json({ error: "No cohosts found for the event" });
+      }
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "User not found" });
+    }
+  });
+  
 
 
 module.exports = events;

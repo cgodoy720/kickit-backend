@@ -203,5 +203,38 @@ const updateEvent = async(id , event) => {
   
   }
 
+  const createCohost = async (userId , eventId) => {
+    try{
+      const add = await db.none(
+        `INSERT INTO events_cohost (user_id , event_id) VALUES($1 , $2)`,
+        [userId , eventId]
+      )
+      return add
+    }
+    catch(error){
+      console.log(error)
+      return error
+    }
+  }
 
-module.exports = {deleteEvent , createEvent, getAllEvents, getEvent, addCategory, deleteCategoryFromEvent, updateEvent}
+const getCoHost = async (id) => {
+try{
+  const getCoHost = await db.any(
+    `SELECT ec.user_id, ec.event_id, 
+    u.profile_img, u.first_name, u.last_name, u.username
+    FROM events_cohost ec
+    JOIN users u ON u.id = ec.user_id
+    JOIN events e ON e.id = ec.event_id
+    WHERE e.id = $1`,
+    id
+  );
+  return getCoHost
+}
+catch(error){
+  console.log(error)
+  return error
+}
+}
+
+
+module.exports = {deleteEvent , createEvent, getAllEvents, getEvent, addCategory, deleteCategoryFromEvent, updateEvent, createCohost, getCoHost}
