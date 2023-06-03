@@ -237,4 +237,24 @@ catch(error){
 }
 
 
-module.exports = {deleteEvent , createEvent, getAllEvents, getEvent, addCategory, deleteCategoryFromEvent, updateEvent, createCohost, getCoHost}
+const allUserCoHost = async (id) => {
+  try {
+    const host = await db.any(
+      `SELECT e.title, e.location_image
+      FROM users u
+      JOIN events_cohost ec ON u.id = ec.user_id
+      JOIN events e ON e.id = ec.event_id
+      WHERE u.id = $1`,
+      id
+    );
+    return host;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+
+module.exports = {deleteEvent , createEvent, getAllEvents, 
+  getEvent, addCategory, 
+  deleteCategoryFromEvent, updateEvent, createCohost, getCoHost, allUserCoHost}

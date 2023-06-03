@@ -12,7 +12,8 @@ const { getAllEvents,
     deleteCategoryFromEvent,
     updateEvent,
     createCohost,
-    getCoHost } = require("../queries/Events");
+    getCoHost,
+    allUserCoHost } = require("../queries/Events");
 
 
 events.use("/:eventId/comments", comm)
@@ -157,6 +158,17 @@ events.post(`/:userId/cohost/:eventId`, async (req, res) => {
     }
   });
   
+//Getting all the events the user is co-hosting
+events.get(`/:id/cohosting`, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const cohostedEvents = await allUserCoHost(id);
+    res.json(cohostedEvents);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "An error occurred while retrieving cohosted events" });
+  }
+});
 
 
 module.exports = events;
