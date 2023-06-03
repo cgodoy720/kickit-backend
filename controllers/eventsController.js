@@ -13,7 +13,8 @@ const { getAllEvents,
     updateEvent,
     createCohost,
     getCoHost,
-    allUserCoHost } = require("../queries/Events");
+    allUserCoHost,
+    deleteCoHost } = require("../queries/Events");
 
 
 events.use("/:eventId/comments", comm)
@@ -170,5 +171,20 @@ events.get(`/:id/cohosting`, async (req, res) => {
   }
 });
 
+
+//Delete co-host from an event 
+events.delete(`/:userId/deletehost/:eventId`, async (req , res) => {
+
+const {userId , eventId} = req.params
+
+const host = await deleteCoHost(userId , eventId)
+
+if(host.length > 0){
+  res.status(200).json(host);
+}
+else {
+        res.status(404).json({ error: "Host not found!"});
+    }
+})
 
 module.exports = events;

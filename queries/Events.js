@@ -255,6 +255,21 @@ const allUserCoHost = async (id) => {
 };
 
 
+const deleteCoHost = async (userId , eventId) => {
+  try{
+    const deleteHost = await db.one(
+      `DELETE FROM events_cohost WHERE user_id=$1 AND event_id=$2`,
+      [userId , eventId]
+    );
+    return deleteHost
+  }
+  catch(error){
+    console.log(error)
+    return error 
+  }
+}
+
+
 module.exports = {deleteEvent , createEvent, getAllEvents, 
   getEvent, addCategory, 
-  deleteCategoryFromEvent, updateEvent, createCohost, getCoHost, allUserCoHost}
+  deleteCategoryFromEvent, updateEvent, createCohost, getCoHost, allUserCoHost, deleteCoHost}
