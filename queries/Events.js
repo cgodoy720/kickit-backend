@@ -240,7 +240,7 @@ catch(error){
 const allUserCoHost = async (id) => {
   try {
     const host = await db.any(
-      `SELECT e.title, e.location_image
+      `SELECT e.title, e.location_image, u.id AS user_id, e.id AS event_id
       FROM users u
       JOIN events_cohost ec ON u.id = ec.user_id
       JOIN events e ON e.id = ec.event_id
