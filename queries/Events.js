@@ -70,54 +70,61 @@ const createEvent = async (event, categoryNames, creatorUsernames) => {
       [creatorUsernames]
     );
 
+      if(categoryIds.length < 1){
+        return { error: 'Event most have at least one category.' };
+      }
+
+      else{
+        const newEvent = await db.one(
+          `INSERT INTO events (title, date_event, summary,
+             max_people, age_restriction, age_min, age_max, location, address, latitude, longitude, start_time, end_time, location_image, creator)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+           RETURNING *`,
+          [
+            event.title,
+            event.date_event,
+            event.summary,
+            event.max_people,
+            event.age_restriction,
+            event.age_min,
+            event.age_max,
+            event.location,
+            event.address,
+            event.latitude,
+            event.longitude,
+            event.start_time,
+            event.end_time,
+            event.location_image,
+            event.creator // Assuming there is only one creator
+          ]
+        );
+    
+        // Insert event-category relationships into events_categories table
+        const eventCategoryValues = categoryIds
+          .map((categoryId) => `(${newEvent.id}, ${categoryId.id})`)
+          .join(',');
+        await db.none(
+          `INSERT INTO events_categories (event_id, category_id) VALUES ${eventCategoryValues}`
+        );
+    
+        // Add category_names and creator arrays to the new event object
+        newEvent.category_names = categoryNames.map((name, index) => ({
+          id: categoryIds[index].id,
+          name: name,
+        }));
+    
+        newEvent.creator = creatorIds.map((username, index) => ({
+          id: creatorIds[index].id,
+          username: username,
+          first_name: first_name,
+          last_name: last_name,
+          age: age
+        }));
+    
+        return newEvent;
+
+      }
     // Insert new event into events table
-    const newEvent = await db.one(
-      `INSERT INTO events (title, date_event, summary,
-         max_people, age_restriction, age_min, age_max, location, address, latitude, longitude, start_time, end_time, location_image, creator)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-       RETURNING *`,
-      [
-        event.title,
-        event.date_event,
-        event.summary,
-        event.max_people,
-        event.age_restriction,
-        event.age_min,
-        event.age_max,
-        event.location,
-        event.address,
-        event.latitude,
-        event.longitude,
-        event.start_time,
-        event.end_time,
-        event.location_image,
-        event.creator // Assuming there is only one creator
-      ]
-    );
-
-    // Insert event-category relationships into events_categories table
-    const eventCategoryValues = categoryIds
-      .map((categoryId) => `(${newEvent.id}, ${categoryId.id})`)
-      .join(',');
-    await db.none(
-      `INSERT INTO events_categories (event_id, category_id) VALUES ${eventCategoryValues}`
-    );
-
-    // Add category_names and creator arrays to the new event object
-    newEvent.category_names = categoryNames.map((name, index) => ({
-      id: categoryIds[index].id,
-      name: name,
-    }));
-
-    newEvent.creator = creatorIds.map((username, index) => ({
-      id: creatorIds[index].id,
-      username: username,
-      first_name: first_name,
-      last_name: last_name,
-      age: age
-    }));
-
-    return newEvent;
   } catch (error) {
     console.log(error);
     return error;
@@ -196,5 +203,73 @@ const updateEvent = async(id , event) => {
   
   }
 
+  const createCohost = async (userId , eventId) => {
+    try{
+      const add = await db.none(
+        `INSERT INTO events_cohost (user_id , event_id) VALUES($1 , $2)`,
+        [userId , eventId]
+      )
+      return add
+    }
+    catch(error){
+      console.log(error)
+      return error
+    }
+  }
 
-module.exports = {deleteEvent , createEvent, getAllEvents, getEvent, addCategory, deleteCategoryFromEvent, updateEvent}
+const getCoHost = async (id) => {
+try{
+  const getCoHost = await db.any(
+    `SELECT ec.user_id, ec.event_id, 
+    u.profile_img, u.first_name, u.last_name, u.username
+    FROM events_cohost ec
+    JOIN users u ON u.id = ec.user_id
+    JOIN events e ON e.id = ec.event_id
+    WHERE e.id = $1`,
+    id
+  );
+  return getCoHost
+}
+catch(error){
+  console.log(error)
+  return error
+}
+}
+
+
+const allUserCoHost = async (id) => {
+  try {
+    const host = await db.any(
+      `SELECT e.title, e.location_image, u.id AS user_id, e.id AS event_id
+      FROM users u
+      JOIN events_cohost ec ON u.id = ec.user_id
+      JOIN events e ON e.id = ec.event_id
+      WHERE u.id = $1`,
+      id
+    );
+    return host;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+
+const deleteCoHost = async (userId , eventId) => {
+  try{
+    const deleteHost = await db.one(
+      `DELETE FROM events_cohost WHERE user_id=$1 AND event_id=$2`,
+      [userId , eventId]
+    );
+    return deleteHost
+  }
+  catch(error){
+    console.log(error)
+    return error 
+  }
+}
+
+
+module.exports = {deleteEvent , createEvent, getAllEvents, 
+  getEvent, addCategory, 
+  deleteCategoryFromEvent, updateEvent, createCohost, getCoHost, allUserCoHost, deleteCoHost}
