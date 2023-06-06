@@ -9,8 +9,8 @@ const getAllEvents = async () => {
       users.username, 'first_name', first_name, 'last_name', last_name, 'age', EXTRACT(YEAR FROM AGE(CURRENT_DATE, age)) )) AS creator,
       to_char(start_time, 'HH:MI AM') AS start_time, 
       to_char(end_time, 'HH:MI AM') AS end_time,
-      to_char(date_created, 'MM/DD/YYYY') AS date_created, 
-      to_char(date_event, 'MM/DD/YYYY') AS date_event
+      to_char(date_created, 'YYYY-MM-DD') AS date_created, 
+      to_char(date_event, 'YYYY-MM-DD') AS date_event
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
@@ -37,8 +37,8 @@ const getEvent = async (id) => {
       users.username, 'first_name', first_name, 'last_name', last_name, 'age', EXTRACT(YEAR FROM AGE(CURRENT_DATE, age)) )) AS creator,
       to_char(start_time, 'HH:MI AM') AS start_time, 
       to_char(end_time, 'HH:MI AM') AS end_time,
-      to_char(date_created, 'MM/DD/YYYY') AS date_created, 
-      to_char(date_event, 'MM/DD/YYYY') AS date_event
+      to_char(date_created, 'YYYY-MM-DD') AS date_created, 
+      to_char(date_event, 'YYYY-MM-DD') AS date_event
       FROM events
       JOIN events_categories ON events.id = events_categories.event_id
       JOIN categories ON categories.id = events_categories.category_id
@@ -257,7 +257,7 @@ const allUserCoHost = async (id) => {
 
 const deleteCoHost = async (userId , eventId) => {
   try{
-    const deleteHost = await db.one(
+    const deleteHost = await db.any(
       `DELETE FROM events_cohost WHERE user_id=$1 AND event_id=$2`,
       [userId , eventId]
     );
