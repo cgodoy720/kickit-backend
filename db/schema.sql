@@ -50,7 +50,6 @@ CREATE TABLE events (
 );
 
 
-
 DROP TABLE IF EXISTS users_categories;
 
 CREATE TABLE users_categories (
@@ -72,6 +71,11 @@ DROP TABLE IF EXISTS users_events;
 CREATE TABLE users_events(
     users_id INTEGER,
     event_id INTEGER,
+    title TEXT,
+    date_event TEXT,
+    location TEXT,
+    address TEXT,
+    location_image TEXT,
     interested BOOLEAN DEFAULT FALSE,
     rsvp BOOLEAN DEFAULT FALSE,
     selected BOOLEAN DEFAULT FALSE,
@@ -86,7 +90,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     IF TG_OP = 'UPDATE' THEN
         UPDATE users_events
-        SET event_id = NEW.id,
+        SET
             title = NEW.title,
             date_event = NEW.date_event,
             location = NEW.location,
@@ -115,10 +119,16 @@ DROP TABLE IF EXISTS users_friends;
 CREATE TABLE users_friends(
     users_id INTEGER,
     friends_id INTEGER,
+    first_name VARCHAR(30),
+    last_name VARCHAR(30),
+    username VARCHAR(30),
+    pronouns TEXT,
+    profile_img TEXT,
     PRIMARY KEY(users_id, friends_id),
     FOREIGN KEY(users_id) REFERENCES users(id),
     FOREIGN KEY(friends_id) REFERENCES users(id)
 );
+
 
 
 -- DROP TABLE IF EXISTS chats;
@@ -173,6 +183,40 @@ CREATE TABLE message (
 -- AFTER UPDATE ON users
 -- FOR EACH ROW
 -- EXECUTE FUNCTION update_users_friends();
+
+
+CREATE OR REPLACE FUNCTION update_users_friends()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'UPDATE' THEN
+        UPDATE users_friends
+        SET
+            first_name = NEW.first_name,
+            last_name = NEW.last_name,
+            pronouns = NEW.pronouns,
+            profile_img = NEW.profile_img
+        WHERE users_id = OLD.id;
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_users_friends_trigger
+AFTER UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION update_users_friends();
+
+
+DROP TABLE IF EXISTS events_cohost;
+CREATE TABLE events_cohost (
+    user_id INTEGER,
+    event_id INTEGER,
+    PRIMARY KEY (user_id, event_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE
+);
+
 
 
 
