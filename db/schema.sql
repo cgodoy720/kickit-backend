@@ -121,6 +121,38 @@ CREATE TABLE users_friends(
 );
 
 
+-- DROP TABLE IF EXISTS chats;
+-- CREATE TABLE chats (
+--     id SERIAL PRIMARY KEY,
+--     sender_id INTEGER,
+--     receiver_id INTEGER,
+--     content TEXT DEFAULT NULL
+-- );
+
+-- rooms table schema
+
+CREATE TABLE rooms (
+    id SERIAL PRIMARY KEY,
+    user1_id INTEGER,
+    user2_id INTEGER,
+    added BOOLEAN NOT NULL,
+    UNIQUE (user1_id, user2_id, added)
+);
+
+
+DROP TABLE IF EXISTS message;
+CREATE TABLE message (
+    id SERIAL PRIMARY KEY,
+    rooms_id INTEGER REFERENCES rooms(id) ON DELETE CASCADE,
+    user1_id INTEGER,
+    user2_id INTEGER,
+    content TEXT DEFAULT NULL,
+    FOREIGN KEY (user1_id) REFERENCES users(id),
+    FOREIGN KEY (user2_id) REFERENCES users(id)
+);
+
+
+
 -- CREATE OR REPLACE FUNCTION update_users_friends()
 -- RETURNS TRIGGER AS $$
 -- BEGIN

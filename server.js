@@ -16,8 +16,12 @@ const eventsController = require("./controllers/EventsController");
 const categoryController = require("./controllers/categoriesController")
 
 const userController = require("./controllers/usersController")
+const roomsController = require("./controllers/roomsController")
+const messagesController = require("./controllers/messagesController")
 
-const friendsController = require("./controllers/friendsController")
+const friendsController = require("./controllers/friendsController");
+const { makeNewRoom } = require("./queries/rooms");
+const { getAllMessages, sendMessage } =  require("./queries/Messages")
 // MIDDLEWARE
 // app.use(cors());
 // app.use(express.json());
@@ -35,7 +39,10 @@ app.use("/category", categoryController)
 
 app.use("/users", userController)
 
-app.use("/friends", friendsController)
+
+app.use("/rooms", roomsController);
+
+app.use("/messages", messagesController);
 
 app.get('*', (req, res) => {
     res.status(404).send('Not Found')
@@ -52,21 +59,39 @@ const io = require("socket.io")(server, {
 	}
   });
 
-io.on("connection", (socket) => {
-  console.log(socket.id);
-console.log('a user connected')
-  socket.on("join_room", (data) => {
-    socket.join(data);
-    console.log("User Joined Room: " + data);
+  io.on("connection", (socket) => {
+    console.log(socket.id);
+    console.log("a user connected");
+  
+    socket.on("switch_room", (roomId) => {
+      socket.leaveAll(); // Leave the current room
+      socket.join(roomId); // Join the new room
+    });
+    
+    socket.on("create_room", async (data) => {
+      // Extract user1Id and user2Id from data
+      const { user1_id, user2_id } = data;
+    
+      try {
+        // Save message and create new room if needed
+        const newMessage = await sendMessage(null, user1_id, user2_id, "New conversation");
+    
+        if (newMessage.rooms_id === null) {
+          const newRoom = await makeNewRoom(user1_id, user2_id);
+          newMessage.rooms_id = newRoom.id;
+        }
+    
+        // Emit the new room and message to the appropriate users
+        socket.to(`user_${user1_id}`).emit("new_room_created", newMessage);
+        socket.to(`user_${user2_id}`).emit("new_room_created", newMessage);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+    
+  
+    socket.on("disconnect", () => {
+      console.log("USER DISCONNECTED");
+    });
   });
-
-  socket.on("send_message", (data) => {
-    console.log(data);
-    socket.to(data.room).emit("receive_message", data.content);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("USER DISCONNECTED");
-  });
-});
-
+  
