@@ -20,12 +20,12 @@ const roomsController = require("./controllers/roomsController")
 const messagesController = require("./controllers/messagesController")
 
 const friendsController = require("./controllers/friendsController");
-const { makeNewRoom } = require("./queries/rooms");
 const { getAllMessages, sendMessage } =  require("./queries/Messages")
 // MIDDLEWARE
 // app.use(cors());
 // app.use(express.json());
 
+const { makeNewRoom } = require("./queries/rooms");
 
 // ROUTES
 app.get('/', (req, res) => {
@@ -39,6 +39,7 @@ app.use("/category", categoryController)
 
 app.use("/users", userController)
 
+app.use("/friends", friendsController)
 
 app.use("/rooms", roomsController);
 

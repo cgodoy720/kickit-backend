@@ -5,26 +5,34 @@ const { getAllRooms, getRooms, makeNewRoom } = require("../queries/rooms");
 
 
 
-rooms.get("/", async (req, res) => {
-  const allRooms = await getAllRooms();
-  if (allRooms[0]) {
-      res.status(200).json(allRooms);
-  } else {
-      res.status(500).json({ error: "server error!"});
-  }
-});
+rooms.get("/:userId", async (req, res) => {
 
+  const {userId} = req.params
 
-rooms.get("/:user1_id/:user2_id", async (req, res) => {
   try {
-    const {user1_id, user2_id} = req.params;
-  
-    let roomsList = await getRooms(user1_id, user2_id);
-    res.status(200).json(roomsList)
+    const allRooms = await getAllRooms(userId);
+    if (allRooms && allRooms.length > 0) {
+      res.status(200).json(allRooms);
+    } else {
+      res.status(500).json({ error: "Server error!" });
+    }
   } catch (error) {
-    res.status(500).json({ error: error });
+    console.log(error);
+    res.status(500).json({ error: "Server error!" });
   }
 });
+
+
+// rooms.get("/:user1_id/:user2_id", async (req, res) => {
+//   try {
+//     const {user1_id, user2_id} = req.params;
+  
+//     let roomsList = await getRooms(user1_id, user2_id);
+//     res.status(200).json(roomsList)
+//   } catch (error) {
+//     res.status(500).json({ error: error });
+//   }
+// });
 
 
 
