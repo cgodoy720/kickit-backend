@@ -19,7 +19,7 @@ INSERT INTO categories(name) VALUES
 
 -- For testing
 -- Insert the first room
-INSERT INTO rooms (user1_id, user2_id, added) VALUES (1, 2, true),(3, 4, true);
+-- INSERT INTO rooms (user1_id, user2_id, added) VALUES (1, 2, true)
 
 -- Insert the second room
 -- INSERT INTO rooms (user1_id, user2_id, added)
