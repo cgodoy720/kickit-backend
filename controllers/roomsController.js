@@ -1,30 +1,30 @@
 const express = require("express");
 const rooms = express.Router();
 
-const { getAllRooms, getRooms, makeNewRoom } = require("../queries/rooms");
+const { getAllRooms, makeNewRoom } = require("../queries/rooms");
+
+const message = require("./messagesController")
+
+rooms.use("/:room_id/messages", message)
 
 
+rooms.get("/:userId", async (req, res) => {
 
-rooms.get("/", async (req, res) => {
-  const allRooms = await getAllRooms();
-  if (allRooms[0]) {
-      res.status(200).json(allRooms);
-  } else {
-      res.status(500).json({ error: "server error!"});
-  }
-});
+  const {userId} = req.params
 
-
-rooms.get("/:user1_id/:user2_id", async (req, res) => {
   try {
-    const {user1_id, user2_id} = req.params;
-  
-    let roomsList = await getRooms(user1_id, user2_id);
-    res.status(200).json(roomsList)
+    const allRooms = await getAllRooms(userId);
+    if (allRooms && allRooms.length > 0) {
+      res.status(200).json(allRooms);
+    } else {
+      res.status(500).json({ error: "Server error!" });
+    }
   } catch (error) {
-    res.status(500).json({ error: error });
+    console.log(error);
+    res.status(500).json({ error: "Server error!" });
   }
 });
+
 
 
 
