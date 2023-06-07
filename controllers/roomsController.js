@@ -1,8 +1,11 @@
 const express = require("express");
 const rooms = express.Router();
 
-const { getAllRooms, getRooms, makeNewRoom } = require("../queries/rooms");
+const { getAllRooms, makeNewRoom } = require("../queries/rooms");
 
+const message = require("./messagesController")
+
+rooms.use("/:room_id/messages", message)
 
 
 rooms.get("/:userId", async (req, res) => {
@@ -22,17 +25,6 @@ rooms.get("/:userId", async (req, res) => {
   }
 });
 
-
-// rooms.get("/:user1_id/:user2_id", async (req, res) => {
-//   try {
-//     const {user1_id, user2_id} = req.params;
-  
-//     let roomsList = await getRooms(user1_id, user2_id);
-//     res.status(200).json(roomsList)
-//   } catch (error) {
-//     res.status(500).json({ error: error });
-//   }
-// });
 
 
 

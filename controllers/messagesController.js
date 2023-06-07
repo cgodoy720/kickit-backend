@@ -1,10 +1,10 @@
 const express = require("express");
-const messages = express.Router();
+const messages = express.Router({mergeParams:true});
 
 const { getAllMessages, sendMessage } = require("../queries/Messages");
 
 // GET route to retrieve all messages from a room
-messages.get("/:room_id", async (req, res) => {
+messages.get("/", async (req, res) => {
   try {
     const { room_id } = req.params;
 
@@ -31,3 +31,9 @@ messages.post("/:room_id", async (req, res) => {
 });
 
 module.exports = messages;
+// {
+//   "roomId": 1,
+//   "senderId": 1,
+//   "receiverId": 2,
+//   "content": "Hello, how are you?"
+// }
