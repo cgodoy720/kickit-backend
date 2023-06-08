@@ -21,6 +21,22 @@ const getAllRooms = async (loggedInUserId) => {
   }
 };
 
+
+const getRoomById = async (roomId) => {
+  try{
+
+    const room = await db.one(`SELECT * FROM rooms where id=$1`, roomId)
+
+    return room
+  }
+
+  catch(error){
+    console.log(error)
+    return error
+  }
+}
+
+
 const makeNewRoom = async (user1_id, user2_id) => {
   try {
     const checkRoom = await db.oneOrNone(
@@ -45,7 +61,8 @@ const makeNewRoom = async (user1_id, user2_id) => {
 
 module.exports = {
   getAllRooms,
-  makeNewRoom
+  makeNewRoom,
+  getRoomById
 };
 
 

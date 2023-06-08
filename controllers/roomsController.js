@@ -1,7 +1,7 @@
 const express = require("express");
 const rooms = express.Router();
 
-const { getAllRooms, makeNewRoom } = require("../queries/rooms");
+const { getAllRooms, makeNewRoom, getRoomById} = require("../queries/rooms");
 
 const message = require("./messagesController")
 
@@ -25,7 +25,23 @@ rooms.get("/:userId", async (req, res) => {
   }
 });
 
+rooms.get("/:roomId/selected", async (req , res) => {
+  const {roomId} = req.params
 
+  try{
+
+    const room = await getRoomById(roomId)
+
+    if(room){
+      res.status(200).json(room);
+    }
+  }
+
+  catch(error){
+    console.log(error);
+    res.status(500).json({ error: "Server error!" });
+  }
+})
 
 
 rooms.post("/:user1_id/new/:user2_id", async (req, res) => {

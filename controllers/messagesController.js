@@ -1,7 +1,7 @@
 const express = require("express");
 const messages = express.Router({mergeParams:true});
 
-const { getAllMessages, sendMessage } = require("../queries/Messages");
+const { getAllMessages, sendMessage, deleteMessage } = require("../queries/Messages");
 
 // GET route to retrieve all messages from a room
 messages.get("/", async (req, res) => {
@@ -29,6 +29,17 @@ messages.post("/:room_id", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+messages.delete("/:id/delete", async (req , res) => {
+  const { id } = req.params;
+  const message = await deleteMessage(id);
+  if (message.id) {
+      res.status(200).json(message);
+  } else {
+      res.status(404).json({ error: "Message not found!"});
+  }
+})
+
 
 module.exports = messages;
 // {
