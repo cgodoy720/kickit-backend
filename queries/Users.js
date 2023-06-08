@@ -6,14 +6,14 @@ const getAllUsers = async () => {
       SELECT users.*, to_char(age, 'MM/DD/YYYY') AS birthdate, DATE_PART('year', AGE(CURRENT_DATE, age)) AS calculated_age
       FROM users`);
 
-    const updateUsers = allUsers.map(user => ({
+    const updateUsers = allUsers.map((user) => ({
       ...user,
       age: {
         DOB: user.birthdate,
-        age: user.calculated_age
+        age: user.calculated_age,
       },
       calculated_age: undefined,
-      birthdate: undefined
+      birthdate: undefined,
     }));
 
     return updateUsers;
@@ -22,8 +22,6 @@ const getAllUsers = async () => {
     return error;
   }
 };
-
-
 
 const getUser = async (username) => {
   try {
@@ -40,10 +38,10 @@ const getUser = async (username) => {
       ...oneUser,
       age: {
         DOB: oneUser.birthdate,
-        age: oneUser.calculated_age
+        age: oneUser.calculated_age,
       },
       calculated_age: undefined,
-      birthdate: undefined
+      birthdate: undefined,
     };
 
     return updatedUser;
@@ -53,19 +51,16 @@ const getUser = async (username) => {
   }
 };
 
-
 const createUser = async (user) => {
   try {
-    
     const getUserName = await db.oneOrNone(
       `SELECT username FROM users WHERE username =$1`,
       user.username
-    )
-    
-    if(getUserName){
-      return { error: 'Duplicate username found!' };
-    }
-    else{
+    );
+
+    if (getUserName) {
+      return { error: "Duplicate username found!" };
+    } else {
       const newUser = await db.one(
         "INSERT INTO users (first_name, last_name, age, username, email, firebase_id, pronouns, bio, profile_img) VALUES ($1, $2, $3, $4, $5, $6 , $7, $8, $9) RETURNING *",
         [
@@ -77,19 +72,17 @@ const createUser = async (user) => {
           user.firebase_id,
           user.pronouns,
           user.bio,
-          user.profile_img
+          user.profile_img,
         ]
       );
-  
+
       return newUser;
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return error;
   }
 };
-
-
 
 const deleteUser = async (id) => {
   try {
@@ -115,7 +108,7 @@ const updateUser = async (id, user) => {
         user.pronouns,
         user.bio,
         user.profile_img,
-        id
+        id,
       ]
     );
 
@@ -126,10 +119,8 @@ const updateUser = async (id, user) => {
   }
 };
 
-
-
 const getUserByFirebaseId = async (firebase_id) => {
-   try {
+  try {
     const oneUser = await db.one(
       `
       SELECT users.*, to_char(age, 'MM/DD/YYYY') AS birthdate, DATE_PART('year', AGE(CURRENT_DATE, age)) AS calculated_age
@@ -143,10 +134,10 @@ const getUserByFirebaseId = async (firebase_id) => {
       ...oneUser,
       age: {
         DOB: oneUser.birthdate,
-        age: oneUser.calculated_age
+        age: oneUser.calculated_age,
       },
       calculated_age: undefined,
-      birthdate: undefined
+      birthdate: undefined,
     };
 
     return updatedUser;
@@ -155,7 +146,6 @@ const getUserByFirebaseId = async (firebase_id) => {
     return error;
   }
 };
-
 
 const getAllEventsForUsers = async (id) => {
   try {
@@ -174,66 +164,59 @@ const getAllEventsForUsers = async (id) => {
   }
 };
 
-
-const getUserEventById = async (userId , eventId) => {
-  try{
+const getUserEventById = async (userId, eventId) => {
+  try {
     const eventsByUser = await db.one(
       `SELECT event_id, users_id, title, location_image, selected, added, rsvp, interested, to_char(date_event, 'MM/DD/YYYY') AS date_event
       FROM users_events
       JOIN users ON users.id = users_events.users_id 
       JOIN events ON events.id = users_events.event_id
-      WHERE users_events.users_id = $1 AND users_events.event_id =$2`, 
-      [userId , eventId]
-    )
-    return eventsByUser
+      WHERE users_events.users_id = $1 AND users_events.event_id =$2`,
+      [userId, eventId]
+    );
+    return eventsByUser;
+  } catch (error) {
+    console.log(error);
+    return error;
   }
-  catch(error){
-    console.log(error)
-    return error
-  }
-}
-
+};
 
 const addEventsToUser = async (userId, eventId) => {
-  try{
+  try {
     const add = await db.none(
       `INSERT INTO users_events (users_id, event_id, selected, interested, rsvp, added) VALUES($1, $2, $3, $4, $5, $6)`,
       [userId, eventId, false, false, false, true]
-    )
-    return !add
+    );
+    return !add;
+  } catch (error) {
+    return error;
   }
-  catch(error){
-    return error
-  }
-}
+};
 
-const deleteEventFromUsers = async (userId , eventId) => {
-  try{
-      const deleteEvent = await db.one(
-          'DELETE FROM users_events WHERE users_id = $1 AND event_id = $2 RETURNING *', 
-          [userId, eventId]
-      )
-      return deleteEvent
+const deleteEventFromUsers = async (userId, eventId) => {
+  try {
+    const deleteEvent = await db.one(
+      "DELETE FROM users_events WHERE users_id = $1 AND event_id = $2 RETURNING *",
+      [userId, eventId]
+    );
+    return deleteEvent;
+  } catch (error) {
+    return error;
   }
-  catch(error){
-      return error
-  }
-}
+};
 
-const updateEventsForUsers = async(user, userId, eventId) => {
-  try{
+const updateEventsForUsers = async (user, userId, eventId) => {
+  try {
     const update = await db.one(
       `UPDATE users_events SET selected=$1, rsvp=$2, interested=$3 WHERE users_id=$4 AND event_id=$5 RETURNING *`,
       [user.selected, user.rsvp, user.interested, userId, eventId]
-    )
-    return update
+    );
+    return update;
+  } catch (error) {
+    console.log(error);
+    return error;
   }
-  catch(error){
-    console.log(error)
-    return error
-  }
-}
-
+};
 
 const getCategoryFromUsers = async (id) => {
   try {
@@ -243,57 +226,55 @@ const getCategoryFromUsers = async (id) => {
     );
     return getCategory;
   } catch (error) {
-
     return error;
   }
 };
 
-const getCategoryFromUserByIndex = async(userId, categoryId) => {
-  try{
-    const getCategory = await db.one(
+const getCategoryFromUserByIndex = async (userId, categoryId) => {
+  try {
+    const getCategory = await db.oneOrNone(
       `SELECT users_categories.users_id, added, users_categories.category_id, categories.name
       FROM users_categories
       JOIN categories ON categories.id = users_categories.category_id
       JOIN users ON users.id = users_categories.users_id
-      WHERE users.id = $1 AND category_id =$2`,
-       [userId , categoryId])
-       return getCategory
-  }
+      WHERE users.id = $1 AND category_id = $2`,
+      [userId, categoryId]
+    );
 
-  catch(error){
-    console.log(error)
-  }
-}
+    if (!getCategory) {
+      throw new Error("Category not found");
+    }
 
+    return getCategory;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 const addCategoryToUser = async (userId, categoryId) => {
-  try{
+  try {
     const add = await db.none(
       `INSERT INTO users_categories (users_id, category_id, added) VALUES($1 , $2, $3)`,
-      [userId , categoryId, true]
-    )
-    return !add
+      [userId, categoryId, true]
+    );
+    return !add;
+  } catch (error) {
+    return error;
   }
-  catch(error){
-
-    return error
-  }
-}
-
+};
 
 const deleteCategoryFromUsers = async (userId, categoryId) => {
-  try{
+  try {
     const deletes = await db.one(
       `DELETE FROM users_categories WHERE users_id = $1 AND category_id =$2 RETURNING *`,
-      [userId , categoryId]
-    )
-    return deletes
+      [userId, categoryId]
+    );
+    return deletes;
+  } catch (error) {
+    return error;
   }
-  catch(error){
-
-    return error
-  }
-}
+};
 
 const getUserAttendingSameEvent = async (eventId) => {
   try {
@@ -309,9 +290,6 @@ const getUserAttendingSameEvent = async (eventId) => {
     return error;
   }
 };
-
-
-
 
 module.exports = {
   getAllUsers,
@@ -329,5 +307,5 @@ module.exports = {
   updateEventsForUsers,
   getUserEventById,
   getCategoryFromUserByIndex,
-  getUserAttendingSameEvent
+  getUserAttendingSameEvent,
 };

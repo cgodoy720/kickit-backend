@@ -1,5 +1,5 @@
 const express = require("express");
-const users = express.Router({mergeParams: true});
+const users = express.Router({ mergeParams: true });
 const {
   getAllUsers,
   getUser,
@@ -16,49 +16,40 @@ const {
   updateEventsForUsers,
   getUserEventById,
   getCategoryFromUserByIndex,
-  getUserAttendingSameEvent
+  getUserAttendingSameEvent,
 } = require("../queries/Users");
 
-const {checkAge} = require("../middleware/usersValidation")
-
+const { checkAge } = require("../middleware/usersValidation");
 
 users.get("/", async (req, res) => {
+  const getUsers = await getAllUsers();
 
-const getUsers = await getAllUsers()
+  const filter = req.query;
 
-const filter = req.query
-
-const filterUsers = getUsers.filter((req) => {
-  let isValid = true
-  for(key in filter){
-    if(isNaN(filter[key])){
-      isValid = isValid && (req[key].toLowerCase() === filter[key].toLowerCase())
+  const filterUsers = getUsers.filter((req) => {
+    let isValid = true;
+    for (key in filter) {
+      if (isNaN(filter[key])) {
+        isValid =
+          isValid && req[key].toLowerCase() === filter[key].toLowerCase();
+      } else {
+        isValid = isValid && req[key] == parseInt(filter[key]);
+      }
     }
-    else{
-      isValid = isValid && (req[key] == parseInt(filter[key]))
-    }
-  }
-  return isValid
-})
-res.json(filterUsers)
-
-
-   
+    return isValid;
+  });
+  res.json(filterUsers);
 });
 
-
 users.get("/:username", async (req, res) => {
+  const { username } = req.params;
 
-  const {username} = req.params
+  const getUsers = await getUser(username);
 
-  const getUsers = await getUser(username)
-
-  if(!getUsers.message){
-
-    res.json(getUsers)
-  }
-  else{
-    res.status(500).json({ error: "User not found!"});
+  if (!getUsers.message) {
+    res.json(getUsers);
+  } else {
+    res.status(500).json({ error: "User not found!" });
   }
 });
 
@@ -71,7 +62,7 @@ users.get("/firebase/:id", async (req, res) => {
   }
 });
 
-users.post("/", checkAge ,async (req, res) => {
+users.post("/", checkAge, async (req, res) => {
   try {
     const user = await createUser(req.body);
     res.status(200).json(user);
@@ -101,115 +92,99 @@ users.put("/:id", async (req, res) => {
 });
 
 //Add Categories to User
-users.post("/:userId/category/:categoryId", async (req , res) => {
-  const {userId , categoryId} = req.params
+users.post("/:userId/category/:categoryId", async (req, res) => {
+  const { userId, categoryId } = req.params;
 
-  const addCategory = await addCategoryToUser(userId , categoryId)
+  const addCategory = await addCategoryToUser(userId, categoryId);
 
-  if(addCategory){
-    res.json({message: "Category Added"});
+  if (addCategory) {
+    res.json({ message: "Category Added" });
   } else {
-    res.json({error: "Category not added"})
+    res.json({ error: "Category not added" });
   }
-  
-})
+});
 
+//Get Categories for User
+users.get("/:userId/category", async (req, res) => {
+  const { userId } = req.params;
 
-//Get Categories for User 
-users.get("/:userId/category", async (req , res) => {
-  const {userId} = req.params
+  const userCategory = await getCategoryFromUsers(userId);
+  res.json(userCategory);
+});
 
-const userCategory = await getCategoryFromUsers(userId)
-res.json(userCategory)
+//Delete Categories for User
+users.delete("/:userId/category/:categoryId", async (req, res) => {
+  const { userId, categoryId } = req.params;
 
-})
+  const deleteCategory = await deleteCategoryFromUsers(userId, categoryId);
 
-//Delete Categories for User 
-users.delete("/:userId/category/:categoryId", async (req , res) => {
-
-  const {userId , categoryId} = req.params
-
-  const deleteCategory = await deleteCategoryFromUsers(userId , categoryId)
-
-  if(deleteCategory){
-    res.status(200).json(deleteCategory)
+  if (deleteCategory) {
+    res.status(200).json(deleteCategory);
   }
-})
+});
 
+//Add Event to User
+users.post("/:userId/events/:eventId", async (req, res) => {
+  const { userId, eventId } = req.params;
 
-//Add Event to User 
-users.post("/:userId/events/:eventId", async (req , res) => {
-  const {userId , eventId} = req.params
-  
+  const addEvent = await addEventsToUser(userId, eventId);
 
-  const addEvent = await addEventsToUser(userId, eventId)
-
-  if(addEvent){
-    res.json({message: "Event Added"});
+  if (addEvent) {
+    res.json({ message: "Event Added" });
   } else {
-    res.json({error: "Event not added"})
+    res.json({ error: "Event not added" });
   }
-
-})
+});
 
 //Get Category From Events
-users.get("/:userId/events", async(req , res) => {
-  const {userId} = req.params;
+users.get("/:userId/events", async (req, res) => {
+  const { userId } = req.params;
 
-  const userEvents = await getAllEventsForUsers(userId)
-  res.json(userEvents)
-})
+  const userEvents = await getAllEventsForUsers(userId);
+  res.json(userEvents);
+});
 
+users.delete("/:userId/events/:eventId", async (req, res) => {
+  const { userId, eventId } = req.params;
 
-users.delete("/:userId/events/:eventId", async (req , res) => {
-  
-const {userId , eventId} = req.params;
+  const deleteEvent = await deleteEventFromUsers(userId, eventId);
 
-const deleteEvent = await deleteEventFromUsers(userId , eventId)
-
-if(deleteEvent){
-  res.status(200).json(deleteEvent)
-}
-
-})
-
-
-users.put("/:userId/events/:eventId", async (req , res) => {
-  const {userId , eventId} = req.params
-
-  const updateEvent = await updateEventsForUsers(req.body, userId, eventId)
-
-  res.json(updateEvent)
-
-})
-
-users.get("/:userId/events/:eventId", async (req , res) => {
-  const {userId , eventId} = req.params
-
-  const userEvent = await getUserEventById(userId , eventId)
-
-  if(!userEvent.message){
-    res.json(userEvent)
+  if (deleteEvent) {
+    res.status(200).json(deleteEvent);
   }
-  else{
-    res.status(404).json({error: "not found"})
+});
+
+users.put("/:userId/events/:eventId", async (req, res) => {
+  const { userId, eventId } = req.params;
+
+  const updateEvent = await updateEventsForUsers(req.body, userId, eventId);
+
+  res.json(updateEvent);
+});
+
+users.get("/:userId/events/:eventId", async (req, res) => {
+  const { userId, eventId } = req.params;
+
+  const userEvent = await getUserEventById(userId, eventId);
+
+  if (!userEvent.message) {
+    res.json(userEvent);
+  } else {
+    res.status(404).json({ error: "not found" });
   }
-})
+});
 
+users.get("/:userId/category/:categoryId", async (req, res) => {
+  const { userId, categoryId } = req.params;
 
-users.get("/:userId/category/:categoryId", async (req , res) => {
-  const {userId , categoryId} = req.params
+  const getCategory = await getCategoryFromUserByIndex(userId, categoryId);
 
-  const getCategory = await getCategoryFromUserByIndex(userId , categoryId)
-
-  if(!getCategory.message){
-    res.json(getCategory)
+  if (getCategory && !getCategory.message) {
+    res.json(getCategory);
+  } else {
+    res.status(404).json({ error: "not found" });
   }
-  else{
-    res.status(404).json({error: "not found"})
-  }
-})
-
+});
 
 users.get("/:eventId/attending", async (req, res) => {
   const { eventId } = req.params;
@@ -222,9 +197,11 @@ users.get("/:eventId/attending", async (req, res) => {
     let isValid = true;
     for (key in filter) {
       if (isNaN(filter[key])) {
-        isValid = isValid && (String(event[key]).toLowerCase() === filter[key].toLowerCase());
+        isValid =
+          isValid &&
+          String(event[key]).toLowerCase() === filter[key].toLowerCase();
       } else {
-        isValid = isValid && (event[key] == parseInt(filter[key]));
+        isValid = isValid && event[key] == parseInt(filter[key]);
       }
     }
     return isValid;
@@ -233,6 +210,4 @@ users.get("/:eventId/attending", async (req, res) => {
   res.json(filterAttending);
 });
 
-
 module.exports = users;
-
