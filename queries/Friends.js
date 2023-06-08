@@ -8,7 +8,7 @@ const sendFriendRequest = async (request) => {
     );
 
     if (getFriendRequest) {
-      return { error: 'Duplicate friend request.' };
+      return { error: "Duplicate friend request." };
     } else {
       const sendRequest = await db.none(
         `
@@ -25,10 +25,6 @@ const sendFriendRequest = async (request) => {
   }
 };
 
-
-
-  
-  
 const acceptFriendRequest = async (userId, senderId) => {
   try {
     await db.task(async (t) => {
@@ -43,12 +39,11 @@ const acceptFriendRequest = async (userId, senderId) => {
       );
 
       if (friendshipExists) {
-        throw new Error('Friendship already exists.');
+        throw new Error("Friendship already exists.");
       }
 
       // Delete the friend request
-      else{
-
+      else {
         await t.none(
           `
           DELETE FROM users_request
@@ -56,7 +51,7 @@ const acceptFriendRequest = async (userId, senderId) => {
           `,
           [userId, senderId]
         );
-  
+
         // Insert the friendship
         await t.none(
           `
@@ -65,7 +60,7 @@ const acceptFriendRequest = async (userId, senderId) => {
           `,
           [userId, senderId]
         );
-  
+
         // Insert the reverse friendship
         await t.none(
           `
@@ -82,71 +77,75 @@ const acceptFriendRequest = async (userId, senderId) => {
   }
 };
 
-
-  
-  const deleteFriendRequest = async (userId, senderId) => {
-    try {
-      await db.none(`
+const deleteFriendRequest = async (userId, senderId) => {
+  try {
+    await db.none(
+      `
         DELETE FROM users_request
         WHERE users_id = $1 AND senders_id = $2;
-      `, [userId, senderId]);
-    } catch (error) {
-      console.log(error)
-      throw error;
-    }
-  };
-  
-  const getFriendsList = async (userId) => {
-    try{
-      return await db.any(`
+      `,
+      [userId, senderId]
+    );
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+const getFriendsList = async (userId) => {
+  try {
+    return await db.any(
+      `
         SELECT u.id, u.first_name, u.last_name, u.profile_img, u.pronouns, u.username
         FROM users u
         INNER JOIN users_friends uf ON u.id = uf.friends_id
         WHERE uf.users_id = $1;
-      `, [userId]);
-    }
-    catch(error){
-      return error
-    }
+      `,
+      [userId]
+    );
+  } catch (error) {
+    return error;
   }
-  
-  const getFriendRequests = async (userId) => {
-    try {
-      return await db.any(`
+};
+
+const getFriendRequests = async (userId) => {
+  try {
+    return await db.any(
+      `
         SELECT u.id, u.first_name, u.last_name, u.profile_img
         FROM users u
         INNER JOIN users_request uq ON u.id = uq.senders_id
         WHERE uq.users_id = $1;
-      `, [userId]);
-    } catch (error) {
-      throw error;
-    }
-  };
-
-
-
-  const deleteFriends = async (userId , friendId) => {
-    try{
-      await db.task(async (t) => {
-        await t.none(
-          `DELETE FROM users_friends WHERE users_id =$1 AND friends_id=$2`,
-          [userId, friendId]
-        )
-        await t.none(
-          `DELETE FROM users_friends WHERE users_id =$1 AND friends_id=$2`,
-          [friendId , userId]
-        )
-      })
-    }
-    catch(error){
-      console.log(error)
-      return error
-    }
+      `,
+      [userId]
+    );
+  } catch (error) {
+    throw error;
   }
-  module.exports={sendFriendRequest
-     ,
-      acceptFriendRequest
-       , deleteFriendRequest
-       , getFriendsList
-       , getFriendRequests
-      , deleteFriends }
+};
+
+const deleteFriends = async (userId, friendId) => {
+  try {
+    await db.task(async (t) => {
+      await t.none(
+        `DELETE FROM users_friends WHERE users_id =$1 AND friends_id=$2`,
+        [userId, friendId]
+      );
+      await t.none(
+        `DELETE FROM users_friends WHERE users_id =$1 AND friends_id=$2`,
+        [friendId, userId]
+      );
+    });
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+module.exports = {
+  sendFriendRequest,
+  acceptFriendRequest,
+  deleteFriendRequest,
+  getFriendsList,
+  getFriendRequests,
+  deleteFriends,
+};
