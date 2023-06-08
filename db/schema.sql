@@ -158,7 +158,8 @@ CREATE TABLE message (
     user2_id INTEGER,
     content TEXT DEFAULT NULL,
     FOREIGN KEY (user1_id) REFERENCES users(id),
-    FOREIGN KEY (user2_id) REFERENCES users(id)
+    FOREIGN KEY (user2_id) REFERENCES users(id),
+     date_created DATE DEFAULT CURRENT_DATE
 );
 
 
