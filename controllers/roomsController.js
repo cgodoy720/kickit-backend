@@ -44,15 +44,14 @@ rooms.get("/:roomId/selected", async (req , res) => {
 })
 
 
-rooms.post("/:user1_id/new/:user2_id", async (req, res) => {
+rooms.post("/:username1/new/:username2", async (req, res) => {
   try {
+    const { username1, username2 } = req.params;
 
-    const {user1_id, user2_id} = req.params;
-
-    let newRoom = await makeNewRoom(user1_id, user2_id);
+    let newRoom = await makeNewRoom(username1, username2);
     res.status(200).json(newRoom);
   } catch (error) {
-    res.status(500).json({ error: error });
+    res.status(500).json({ error: error.message });
   }
 });
 

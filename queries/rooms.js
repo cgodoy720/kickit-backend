@@ -37,11 +37,25 @@ const getRoomById = async (roomId) => {
 }
 
 
-const makeNewRoom = async (user1_id, user2_id) => {
+const makeNewRoom = async (username1, username2) => {
   try {
+    // Get user IDs based on usernames
+    const user1 = await db.oneOrNone(
+      "SELECT id FROM users WHERE username = $1",
+      username1
+    );
+    const user2 = await db.oneOrNone(
+      "SELECT id FROM users WHERE username = $1",
+      username2
+    );
+
+    if (!user1 || !user2) {
+      throw new Error("One or both users do not exist.");
+    }
+
     const checkRoom = await db.oneOrNone(
       "SELECT * FROM rooms WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)",
-      [user1_id, user2_id]
+      [user1.id, user2.id]
     );
 
     if (checkRoom !== null) {
@@ -49,7 +63,7 @@ const makeNewRoom = async (user1_id, user2_id) => {
     } else {
       const newRoom = await db.one(
         "INSERT INTO rooms (user1_id, user2_id, added) VALUES ($1, $2, $3) RETURNING *",
-        [user1_id, user2_id, true]
+        [user1.id, user2.id, true]
       );
       return newRoom;
     }
