@@ -98,26 +98,34 @@ const deleteUser = async (id) => {
 
 const updateUser = async (id, user) => {
   try {
-    const updatedUser = await db.one(
-      "UPDATE users SET first_name=$1, last_name=$2, username=$3, email=$4, pronouns=$5, bio=$6, profile_img=$7 WHERE id=$8 RETURNING *",
-      [
-        user.first_name,
-        user.last_name,
-        user.username,
-        user.email,
-        user.pronouns,
-        user.bio,
-        user.profile_img,
-        id,
-      ]
-    );
+    let query = "UPDATE users SET first_name=$1, last_name=$2, pronouns=$3, bio=$4";
+    const queryValues = [user.first_name, user.last_name, user.pronouns, user.bio];
+    let paramIndex = 5; // Start index for additional parameters
 
+    // Check if an image file was uploaded
+    if (user.profile_img) {
+      query += ", profile_img=$" + paramIndex;
+      queryValues.push(user.profile_img);
+      paramIndex++; // Increment the index for the next parameter
+    }
+
+    query += " WHERE id=$" + paramIndex + " RETURNING *";
+    queryValues.push(id);
+
+    const updatedUser = await db.one(query, queryValues);
+
+
+    console.log(updatedUser)
     return updatedUser;
   } catch (error) {
     console.log(error);
     return error;
   }
 };
+
+
+
+
 
 const getUserByFirebaseId = async (firebase_id) => {
   try {
