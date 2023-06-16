@@ -11,7 +11,7 @@ const server = app.listen("8080", () => {
   console.log("Server Running on Port 8080...");
 });
 
-const eventsController = require("./controllers/EventsController"); 
+const eventsController = require("./controllers/eventsController"); 
 
 const categoryController = require("./controllers/categoriesController")
 
