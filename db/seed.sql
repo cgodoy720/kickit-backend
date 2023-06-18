@@ -1,17 +1,17 @@
 \c kickit;
 
 INSERT INTO categories(name) VALUES
-1('Music'),
-2('Art'),
-3('Sport'),
-4('Going Out'),
-5('Gaming'),
-6('Tech'),
-7('Food & Drinks'),
-8('Education'),
-9('Outdoors & Adventures'),
-10('Community'),
-11('Other');
+    ('Music'),
+    ('Art'),
+    ('Sport'),
+    ('Going Out'),
+    ('Gaming'),
+    ('Tech'),
+    ('Food & Drinks'),
+    ('Education'),
+    ('Outdoors & Adventures'),
+    ('Community'),
+    ('Other');
 
 INSERT INTO users_categories (users_id, category_id, added)
 VALUES
@@ -76,19 +76,19 @@ VALUES
 
 INSERT INTO users (first_name, last_name, age, username, email, pronouns, bio, profile_img, firebase_id)
 VALUES
-    1('John', 'Doe', '1990-05-15', 'johndoe', 'johndoe@example.com', 'He/Him', 'Art enthusiast capturing life''s beauty through photography. Exploring the world one frame at a time.', 'https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1385&q=80', 'firebase_id_johndoe'),
-    2('Jane', 'Smith', '1995-07-20', 'janesmith', 'janesmith@example.com', 'She/Her', 'I''m a high school English teacher and I love immersing myself in a good fantasy novel.', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_janesmith'),
-    3('David', 'Johnson', '1988-12-10', 'davidjohnson', 'davidjohnson@example.com', '', 'Archery aficionado and dance enthusiast. Embracing the grace of movement while aiming for bullseyes.', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_davidjohnson'),
-    4('Sarah', 'Davis', '1992-03-25', 'sarahdavis', 'sarahdavis@example.com', 'They/Them', 'Passionate about music, art, dance, you name it. I love transforming thoughts and emotions into vibrant creations.', 'https://images.unsplash.com/photo-1532074205216-d0e1f4b87368?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=741&q=80', 'firebase_id_sarahdavis'),
-    5('Michael', 'Brown', '1991-09-05', 'michaelbrown', 'michaelbrown@example.com', '', 'Yoga instructor and personal trainer. Nurturing mind, body, and soul through mindful movement and healthy living.', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_michaelbrown'),
-    6('Emily', 'Wilson', '1989-11-18', 'emilywilson', 'emilywilson@example.com', '', 'Nature lover exploring the great outdoors with my furry companions. Adventure awaits, one wagging tail at a time.', 'https://plus.unsplash.com/premium_photo-1671581559476-10b8a92ffb77?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80', 'firebase_id_emilywilson'),
-    7('James', 'Taylor', '1994-02-08', 'jamestaylor', 'jamestaylor@example.com', 'He/Him', 'I only like my bed and my bike, I''m sorry. Looking for a riding buddy to explore the open roads.', 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_jamestaylor'),
-    8('Olivia', 'Anderson', '1993-06-30', 'oliviaanderson', 'oliviaanderson@example.com', 'They/Them', 'College student cherishing chill days between study sessions. Embracing relaxation and self-care amidst the academic hustle.', 'https://plus.unsplash.com/premium_photo-1675034393381-7e246fc40755?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_oliviaanderson'),
-    9('Daniel', 'Miller', '1987-08-12', 'danielmiller', 'danielmiller@example.com', '', 'Gamer at heart. I love all things retro and the nostalgia they bring.', 'https://images.unsplash.com/photo-1517070208541-6ddc4d3efbcb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_danielmiller'),
-    10('Sophia', 'Wilson', '1996-01-25', 'sophiawilson', 'sophiawilson@example.com', 'She/Her', 'Truly passionate about conservation and striving to make our world a greener place.', 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=761&q=80', 'firebase_id_sophiawilson'),
-    11('Matthew', 'Jones', '1990-04-05', 'matthewjones', 'matthewjones@example.com', 'He/Him', 'Software engineer building connections in the industry. Seeking collaborations and networking opportunities to fuel innovation.', 'https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80', 'firebase_id_matthewjones'),
-    12('Emma', 'Martinez', '1991-07-15', 'emmamartinez', 'emmamartinez@example.com', 'She/Her', 'Digital artist eager to get out and get fit through sports.', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80', 'firebase_id_emmamartinez'),
-    13('Andrew', 'Clark', '1988-09-20', 'andrewclark', 'andrewclark@example.com', '', 'Family-oriented, but looking for new buddies with similar values to share a cold beer and catch a game', 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_andrewclark');
+    ('John', 'Doe', '1990-05-15', 'johndoe', 'johndoe@example.com', 'He/Him', 'Art enthusiast capturing life''s beauty through photography. Exploring the world one frame at a time.', 'https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1385&q=80', 'firebase_id_johndoe'),
+    ('Jane', 'Smith', '1995-07-20', 'janesmith', 'janesmith@example.com', 'She/Her', 'I''m a high school English teacher and I love immersing myself in a good fantasy novel.', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_janesmith'),
+    ('David', 'Johnson', '1988-12-10', 'davidjohnson', 'davidjohnson@example.com', '', 'Archery aficionado and dance enthusiast. Embracing the grace of movement while aiming for bullseyes.', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_davidjohnson'),
+    ('Sarah', 'Davis', '1992-03-25', 'sarahdavis', 'sarahdavis@example.com', 'They/Them', 'Passionate about music, art, dance, you name it. I love transforming thoughts and emotions into vibrant creations.', 'https://images.unsplash.com/photo-1532074205216-d0e1f4b87368?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=741&q=80', 'firebase_id_sarahdavis'),
+    ('Michael', 'Brown', '1991-09-05', 'michaelbrown', 'michaelbrown@example.com', '', 'Yoga instructor and personal trainer. Nurturing mind, body, and soul through mindful movement and healthy living.', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_michaelbrown'),
+    ('Emily', 'Wilson', '1989-11-18', 'emilywilson', 'emilywilson@example.com', '', 'Nature lover exploring the great outdoors with my furry companions. Adventure awaits, one wagging tail at a time.', 'https://plus.unsplash.com/premium_photo-1671581559476-10b8a92ffb77?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80', 'firebase_id_emilywilson'),
+    ('James', 'Taylor', '1994-02-08', 'jamestaylor', 'jamestaylor@example.com', 'He/Him', 'I only like my bed and my bike, I''m sorry. Looking for a riding buddy to explore the open roads.', 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_jamestaylor'),
+    ('Olivia', 'Anderson', '1993-06-30', 'oliviaanderson', 'oliviaanderson@example.com', 'They/Them', 'College student cherishing chill days between study sessions. Embracing relaxation and self-care amidst the academic hustle.', 'https://plus.unsplash.com/premium_photo-1675034393381-7e246fc40755?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_oliviaanderson'),
+    ('Daniel', 'Miller', '1987-08-12', 'danielmiller', 'danielmiller@example.com', '', 'Gamer at heart. I love all things retro and the nostalgia they bring.', 'https://images.unsplash.com/photo-1517070208541-6ddc4d3efbcb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_danielmiller'),
+    ('Sophia', 'Wilson', '1996-01-25', 'sophiawilson', 'sophiawilson@example.com', 'She/Her', 'Truly passionate about conservation and striving to make our world a greener place.', 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=761&q=80', 'firebase_id_sophiawilson'),
+    ('Matthew', 'Jones', '1990-04-05', 'matthewjones', 'matthewjones@example.com', 'He/Him', 'Software engineer building connections in the industry. Seeking collaborations and networking opportunities to fuel innovation.', 'https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80', 'firebase_id_matthewjones'),
+    ('Emma', 'Martinez', '1991-07-15', 'emmamartinez', 'emmamartinez@example.com', 'She/Her', 'Digital artist eager to get out and get fit through sports.', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80', 'firebase_id_emmamartinez'),
+    ('Andrew', 'Clark', '1988-09-20', 'andrewclark', 'andrewclark@example.com', '', 'Family-oriented, but looking for new buddies with similar values to share a cold beer and catch a game', 'https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80', 'firebase_id_andrewclark');
 
 INSERT INTO events (title, date_created, date_event, summary, max_people, age_restriction, age_min, age_max, location, address, start_time, end_time, creator, location_image)
 VALUES
