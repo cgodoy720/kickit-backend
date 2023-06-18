@@ -175,11 +175,11 @@ const getAllEventsForUsers = async (id) => {
 const getUserEventById = async (userId, eventId) => {
   try {
     const eventsByUser = await db.one(
-      `SELECT event_id, users_id, title, location_image, selected, added, rsvp, interested, to_char(date_event, 'MM/DD/YYYY') AS date_event
-      FROM users_events
-      JOIN users ON users.id = users_events.users_id 
-      JOIN events ON events.id = users_events.event_id
-      WHERE users_events.users_id = $1 AND users_events.event_id =$2`,
+      `SELECT ue.event_id, ue.users_id, e.title, e.location_image, ue.selected, ue.added, ue.rsvp, ue.interested, 
+      to_char(e.date_event, 'MM/DD/YYYY') AS date_event FROM users_events ue
+      JOIN users u ON u.id = ue.users_id
+      JOIN events e ON e.id = ue.event_id
+      WHERE ue.users_id = $1 AND ue.event_id =$2`,
       [userId, eventId]
     );
     return eventsByUser;
