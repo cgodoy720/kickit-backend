@@ -118,7 +118,8 @@ const createEvent = async (event, categoryNames, creatorUsernames) => {
           username: username,
           first_name: first_name,
           last_name: last_name,
-          age: age
+          age: age,
+          profile_img: profile_img
         }));
     
         return newEvent;
