@@ -3,8 +3,11 @@ const db = require("../db/dbConfig");
 const getAllUsers = async () => {
   try {
     const allUsers = await db.manyOrNone(`
-      SELECT users.*, to_char(age, 'MM/DD/YYYY') AS birthdate, DATE_PART('year', AGE(CURRENT_DATE, age)) AS calculated_age
-      FROM users`);
+      SELECT users.*, to_char(age, 'MM/DD/YYYY') AS birthdate, DATE_PART('year', AGE(CURRENT_DATE, age)) AS calculated_age,
+      ARRAY_AGG( json_build_object('category_id', users_categories.category_id)) AS categories
+      FROM users
+      LEFT JOIN users_categories ON users.id = users_categories.users_id
+      GROUP BY users.id`);
 
     const updateUsers = allUsers.map((user) => ({
       ...user,

@@ -51,20 +51,32 @@ users.get("/", async (req, res) => {
 
   const filter = req.query;
 
-  const filterUsers = getUsers.filter((req) => {
+  const filterUsers = getUsers.filter((user) => {
     let isValid = true;
     for (key in filter) {
       if (isNaN(filter[key])) {
         isValid =
-          isValid && req[key].toLowerCase() === filter[key].toLowerCase();
-      } else {
-        isValid = isValid && req[key] == parseInt(filter[key]);
+          isValid && user[key].toLowerCase() === filter[key].toLowerCase();
+      } 
+      else if (key === "categories.category_id") {
+        const categoryIdFilter = parseInt(filter[key]);
+      
+        const matchingUser = user.categories.find((category) => {
+          return category.category_id === categoryIdFilter;
+        });
+        isValid = isValid && (matchingUser !== undefined);
+      }
+      else {
+        isValid = isValid && user[key] == parseInt(filter[key]);
       }
     }
     return isValid;
   });
+
   res.json(filterUsers);
 });
+
+
 
 users.get("/:username", async (req, res) => {
   const { username } = req.params;
@@ -129,12 +141,30 @@ users.post("/:userId/category/:categoryId", async (req, res) => {
   }
 });
 
+
+
 //Get Categories for User
 users.get("/:userId/category", async (req, res) => {
   const { userId } = req.params;
 
   const userCategory = await getCategoryFromUsers(userId);
-  res.json(userCategory);
+
+  const filter = req.query
+
+  const filterCategory = userCategory.filter((req) => {
+    let isValid = true
+    for(key in filter){
+      if(isNaN(filter[key])){
+        isValid = isValid && req[key].toLowerCase() === filter[key].toLowerCase()
+      }
+      else{
+        isValid = isValid && req[key] == parseInt(filter[key])
+      }
+    }
+    return isValid
+  })
+
+  res.json(filterCategory);
 });
 
 //Delete Categories for User
